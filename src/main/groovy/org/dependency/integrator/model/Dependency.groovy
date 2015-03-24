@@ -14,7 +14,7 @@ interface Dependency {
     /**
      * Should be able to find corresponding ProjectSource by its name property
      */
-    String projectSourceName
+    String getProjectSourceName()
 
     /**
      * If true, then this dependency should not be automatically changed in the project

@@ -4,16 +4,20 @@ import org.dependency.integrator.model.Dependency
 import org.dependency.integrator.model.ProjectSource
 import org.dependency.integrator.model.Version
 
-/**
- * Created by paulslusarz on 3/24/2015.
- */
 class ProjectSourceForTesting implements ProjectSource {
 
     String name
+    int version = 1
+    List<DependencyForTesting> dependencies = []
 
     ProjectSourceForTesting(Closure config) {
         config.delegate = this
         config.call()
+    }
+
+    def depends(String name, int version) {
+        def dep = new DependencyForTesting(projectSourceName: name, version: new VersionForTesting(value: version))
+        dependencies << dep
     }
 
     @Override
@@ -23,12 +27,12 @@ class ProjectSourceForTesting implements ProjectSource {
 
     @Override
     Version getVersion() {
-        return null
+        return new VersionForTesting(value: version)
     }
 
     @Override
     void incrementVersion() {
-
+      version ++
     }
 
     @Override
@@ -38,7 +42,7 @@ class ProjectSourceForTesting implements ProjectSource {
 
     @Override
     Collection<Dependency> getDependencies() {
-        return null
+        return dependencies
     }
 
     @Override

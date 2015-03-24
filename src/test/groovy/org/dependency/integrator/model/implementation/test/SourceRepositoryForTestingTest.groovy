@@ -20,4 +20,26 @@ class SourceRepositoryForTestingTest {
         assert projects.find {it.name == 'project2'}
     }
 
+    @Test
+    void testProjectsWithDependencies() {
+        def srt = new SourceRepositoryForTesting({
+            project {
+                name = "project1"
+                version = 1
+                depends("project2", 1)
+            }
+
+            project {
+                name = "project2"
+                version = 2
+            }
+        })
+
+        def projects = srt.init(new File("blah"))
+
+        def dependency = projects.find {it.name == "project1"}.dependencies.find {it.projectSourceName == "project2"}
+        assert dependency
+        assert dependency.version.before(projects.find {it.name == "project2"}.version)
+    }
+
 }
