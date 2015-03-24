@@ -1,10 +1,5 @@
 package org.dependency.integrator.model
 
-import groovy.transform.EqualsAndHashCode
-import groovy.transform.ToString
-
-@EqualsAndHashCode
-@ToString
 interface Version {
     public String value
 
