@@ -1,8 +1,6 @@
-package org.dependency.integrator.model
+package org.di.api
 
 interface Version {
-    public String value
-
     /**
      * Produce a copy, such that
      * a.increment().after(a)

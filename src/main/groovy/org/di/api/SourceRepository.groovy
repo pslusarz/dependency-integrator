@@ -1,4 +1,4 @@
-package org.dependency.integrator.model
+package org.di.api
 
 /**
  * Represents all projects that are to be integrated.

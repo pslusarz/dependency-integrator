@@ -1,8 +1,8 @@
-package org.dependency.integrator.model.implementation.test
+package org.di.api.impl.test
 
-import org.dependency.integrator.model.implementation.utils.DependencyForTesting
-import org.dependency.integrator.model.implementation.utils.ProjectSourceForTesting
-import org.dependency.integrator.model.implementation.utils.VersionForTesting
+import org.di.api.impl.utils.ProjectSourceForTesting
+import org.di.api.impl.utils.VersionForTesting
+import org.di.api.impl.utils.DependencyForTesting
 import org.junit.Test
 
 class ProjectSourceForTestingTest {
@@ -31,12 +31,14 @@ class ProjectSourceForTestingTest {
 
     @Test
     void testSetDependencyVersionReplacesOldDependencyByName() {
+        def SMALLER = 1
+        def LARGER = 2
         def project = new ProjectSourceForTesting({
             name = "myproject"
-            depends("another", 2)
+            depends("another", LARGER)
         })
         def original = project.dependencies.find {"another"}
-        def dependency = new DependencyForTesting(projectSourceName: "another", version: new VersionForTesting(value: 1))
+        def dependency = new DependencyForTesting(projectSourceName: "another", version: new VersionForTesting(value: SMALLER))
         project.setDependencyVersion(dependency, dependency.version)
         assert project.dependencies.findAll {it.projectSourceName == "another"}.size() == 1
         assert original.version.after(project.dependencies.find {it.projectSourceName == "another"}.version)

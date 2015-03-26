@@ -1,4 +1,4 @@
-package org.dependency.integrator.model
+package org.di.api
 
 /**
  * Created by ps on 3/18/15.

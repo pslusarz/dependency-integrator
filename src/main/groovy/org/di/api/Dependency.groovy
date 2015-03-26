@@ -1,4 +1,4 @@
-package org.dependency.integrator.model
+package org.di.api
 
 /**
  * Dependency that a project has on a versioned artifact produced by another project

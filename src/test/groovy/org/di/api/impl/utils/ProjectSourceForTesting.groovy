@@ -1,9 +1,9 @@
-package org.dependency.integrator.model.implementation.utils
+package org.di.api.impl.utils
 
 import groovy.transform.ToString
-import org.dependency.integrator.model.Dependency
-import org.dependency.integrator.model.ProjectSource
-import org.dependency.integrator.model.Version
+import org.di.api.Dependency
+import org.di.api.Version
+import org.di.api.ProjectSource
 
 @ToString
 class ProjectSourceForTesting implements ProjectSource {

@@ -1,7 +1,7 @@
-package org.dependency.integrator.model.implementation.utils
+package org.di.api.impl.utils
 
-import org.dependency.integrator.model.ProjectSource
-import org.dependency.integrator.model.SourceRepository
+import org.di.api.ProjectSource
+import org.di.api.SourceRepository
 
 class SourceRepositoryForTesting implements SourceRepository {
 

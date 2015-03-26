@@ -1,6 +1,6 @@
-package org.dependency.integrator.model.implementation.test
+package org.di.api.impl.test
 
-import org.dependency.integrator.model.implementation.utils.VersionForTesting
+import org.di.api.impl.utils.VersionForTesting
 import org.junit.Test
 
 class VersionForTestingTest {
