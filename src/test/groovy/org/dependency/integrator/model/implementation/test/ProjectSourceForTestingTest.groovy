@@ -1,5 +1,8 @@
 package org.dependency.integrator.model.implementation.test
 
+import org.dependency.integrator.model.implementation.utils.DependencyForTesting
+import org.dependency.integrator.model.implementation.utils.ProjectSourceForTesting
+import org.dependency.integrator.model.implementation.utils.VersionForTesting
 import org.junit.Test
 
 class ProjectSourceForTestingTest {

@@ -1,4 +1,4 @@
-package org.dependency.integrator.model.implementation.test
+package org.dependency.integrator.model.implementation.utils
 
 import org.dependency.integrator.model.ProjectSource
 import org.dependency.integrator.model.SourceRepository

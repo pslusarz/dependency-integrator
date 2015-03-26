@@ -1,4 +1,4 @@
-package org.dependency.integrator.model.implementation.test
+package org.dependency.integrator.model.implementation.utils
 
 import groovy.transform.ToString
 import org.dependency.integrator.model.Dependency

@@ -1,5 +1,6 @@
 package org.dependency.integrator.model.implementation.test
 
+import org.dependency.integrator.model.implementation.utils.SourceRepositoryForTesting
 import org.junit.Test
 
 class SourceRepositoryForTestingTest {
