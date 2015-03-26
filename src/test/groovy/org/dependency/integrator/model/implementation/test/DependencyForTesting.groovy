@@ -1,10 +1,12 @@
 package org.dependency.integrator.model.implementation.test
 
+import groovy.transform.ToString
 import org.dependency.integrator.model.Dependency
 import org.dependency.integrator.model.Version
 
+@ToString
 class DependencyForTesting implements Dependency{
-    VersionForTesting version
+    Version version
     String projectSourceName
 
 

@@ -1,9 +1,11 @@
 package org.dependency.integrator.model.implementation.test
 
+import groovy.transform.ToString
 import org.dependency.integrator.model.Dependency
 import org.dependency.integrator.model.ProjectSource
 import org.dependency.integrator.model.Version
 
+@ToString
 class ProjectSourceForTesting implements ProjectSource {
 
     String name
@@ -42,12 +44,15 @@ class ProjectSourceForTesting implements ProjectSource {
 
     @Override
     Collection<Dependency> getDependencies() {
-        return dependencies
+        def result =  []
+        result.addAll(dependencies)
+        return result
     }
 
     @Override
     void setDependencyVersion(Dependency dependency, Version newVersion) {
-
+      dependencies.remove (dependencies.find {it.projectSourceName == dependency.projectSourceName})
+      dependencies << new DependencyForTesting(projectSourceName: dependency.projectSourceName, version: newVersion)
     }
 
     @Override

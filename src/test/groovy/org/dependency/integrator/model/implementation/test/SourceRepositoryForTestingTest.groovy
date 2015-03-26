@@ -42,4 +42,23 @@ class SourceRepositoryForTestingTest {
         assert dependency.version.before(projects.find {it.name == "project2"}.version)
     }
 
+    @Test
+    void testProjectDependencyBumpPersisted() {
+        def srt = new SourceRepositoryForTesting({
+            project {
+                name = "project1"
+                version = 1
+                depends("project2", 1)
+            }
+        })
+        def project = srt.init(new File("blah")).find {it.name == "project1"}
+        def dependency = project.dependencies.find {it.projectSourceName == "project2"}
+        project.setDependencyVersion(dependency, dependency.version.increment())
+        assert project.dependencies.find{it.projectSourceName == "project2"}.version.after(dependency.version)
+        def reinitializedProject = srt.init(new File("blah")).find {it.name == "project1"}
+        assert reinitializedProject.dependencies.find{it.projectSourceName == "project2"}.version.after(dependency.version)
+
+
+    }
+
 }
