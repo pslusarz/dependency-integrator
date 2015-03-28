@@ -5,19 +5,21 @@ package org.di.api
  * Has knowledge of remote source control repository where the projects reside.
  */
 public interface SourceRepository {
+
+    File getLocalDir()
+    void setLocalDir(File localDir)
+
     /**
      * Download all projects to this machine. Will overwrite a project
      * if it exists in localDir
-     * @param localDir
      */
-    void downloadAll(File localDir)
+    void downloadAll()
 
     /**
      * Discover all projects whose source is stored in the location
-     * @param localDir
      * @return
      */
-    Collection<ProjectSource> init(File localDir)
+    Collection<ProjectSource> init()
 
     /**
      * Commit all changes to remote source control repository.

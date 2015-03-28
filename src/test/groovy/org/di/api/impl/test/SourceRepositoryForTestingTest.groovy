@@ -15,7 +15,7 @@ class SourceRepositoryForTestingTest {
                 name = "project2"
             }
         })
-        def projects = srt.init(new File("blah"))
+        def projects = srt.init()
         assert projects.size() == 2
         assert projects.find {it.name == 'project1'}
         assert projects.find {it.name == 'project2'}
@@ -36,7 +36,7 @@ class SourceRepositoryForTestingTest {
             }
         })
 
-        def projects = srt.init(new File("blah"))
+        def projects = srt.init()
 
         def dependency = projects.find {it.name == "project1"}.dependencies.find {it.projectSourceName == "project2"}
         assert dependency
@@ -52,11 +52,11 @@ class SourceRepositoryForTestingTest {
                 depends("project2", 1)
             }
         })
-        def project = srt.init(new File("blah")).find {it.name == "project1"}
+        def project = srt.init().find {it.name == "project1"}
         def dependency = project.dependencies.find {it.projectSourceName == "project2"}
         project.setDependencyVersion(dependency, dependency.version.increment())
         assert project.dependencies.find{it.projectSourceName == "project2"}.version.after(dependency.version)
-        def reinitializedProject = srt.init(new File("blah")).find {it.name == "project1"}
+        def reinitializedProject = srt.init().find {it.name == "project1"}
         assert reinitializedProject.dependencies.find{it.projectSourceName == "project2"}.version.after(dependency.version)
 
 

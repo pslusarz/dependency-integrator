@@ -6,6 +6,7 @@ import org.di.api.SourceRepository
 class SourceRepositoryForTesting implements SourceRepository {
 
     List<ProjectSource> projectSources
+    File localDir
 
     SourceRepositoryForTesting(Closure config) {
         projectSources = []
@@ -19,12 +20,12 @@ class SourceRepositoryForTesting implements SourceRepository {
     }
 
     @Override
-    void downloadAll(File localDir) {
-        println "downloaded to: "+localDir.absolutePath
+    void downloadAll() {
+        println "downloaded to: "+localDir?.absolutePath
     }
 
     @Override
-    Collection<ProjectSource> init(File localDir) {
+    Collection<ProjectSource> init() {
         return projectSources
     }
 
@@ -33,5 +34,9 @@ class SourceRepositoryForTesting implements SourceRepository {
         println "uploaded "+project.name+" to public source repository"
     }
 
+    @Override
+    void setLocalDir(File localDir) {
+        this.localDir = localDir
+    }
 
 }
