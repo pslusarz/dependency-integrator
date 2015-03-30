@@ -3,7 +3,7 @@ package org.di.api.impl.utils
 import groovy.transform.ToString
 import org.di.api.Version
 
-@ToString
+@ToString(includePackage = false)
 class VersionForTesting implements Version {
 
     int value

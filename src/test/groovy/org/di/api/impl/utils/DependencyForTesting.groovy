@@ -4,7 +4,7 @@ import groovy.transform.ToString
 import org.di.api.Dependency
 import org.di.api.Version
 
-@ToString
+@ToString(includePackage = false)
 class DependencyForTesting implements Dependency{
     Version version
     String projectSourceName

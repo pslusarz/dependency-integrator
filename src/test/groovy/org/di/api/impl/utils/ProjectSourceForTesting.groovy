@@ -5,7 +5,7 @@ import org.di.api.Dependency
 import org.di.api.Version
 import org.di.api.ProjectSource
 
-@ToString
+@ToString(includePackage = false)
 class ProjectSourceForTesting implements ProjectSource {
 
     String name
