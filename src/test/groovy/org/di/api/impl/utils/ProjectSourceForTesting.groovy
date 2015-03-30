@@ -17,7 +17,7 @@ class ProjectSourceForTesting implements ProjectSource {
         config.call()
     }
 
-    def depends(String name, int version) {
+    def depends(String name, int version = 1) {
         def dep = new DependencyForTesting(projectSourceName: name, version: new VersionForTesting(value: version))
         dependencies << dep
     }
