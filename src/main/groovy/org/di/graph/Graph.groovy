@@ -26,19 +26,25 @@ class Graph {
     def initCycles() {
         cycles = []
         def stack = []
-        stack.push([node: nodes[0], path: []])
+        HashSet<Node> visited = new HashSet()
+        nodes.each {
+            stack.push([node: it, path: []])
+        }
         while (!stack.isEmpty()) {
             def current = stack.pop()
             if (current.path.collect { it.name }.contains(current.node.name)) {
               cycles << current.path.drop(current.path.indexOf(current.node))  // a, b, c, b, c... -> 'a' is not part of the cycle
-            } else {
+            } else if (!visited.contains(current.node)) {
                 current.node.outgoing.collect{it.to}.each { Node dependency ->
                     def newPath = []
                     newPath.addAll(current.path)
                     newPath << current.node
                     stack.push([node: dependency, path: newPath])
                 }
+                visited << current.node
             }
+
+
         }
     }
 }
