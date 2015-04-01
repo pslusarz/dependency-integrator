@@ -30,7 +30,7 @@ class Graph {
         while (!stack.isEmpty()) {
             def current = stack.pop()
             if (current.path.collect { it.name }.contains(current.node.name)) {
-              cycles << current.path
+              cycles << current.path.drop(current.path.indexOf(current.node))  // a, b, c, b, c... -> 'a' is not part of the cycle
             } else {
                 current.node.outgoing.collect{it.to}.each { Node dependency ->
                     def newPath = []
