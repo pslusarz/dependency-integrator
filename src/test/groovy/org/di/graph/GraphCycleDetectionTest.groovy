@@ -18,8 +18,9 @@ class GraphCycleDetectionTest {
         Graph g = new Graph(sr)
         g.initCycles()
         assert g.cycles.size() == 1
-        g.cycles[0].size() == 1
-        g.cycles[0][0].name == "quine"
+        assert g.cycles[0].size() == 1
+        assert g.cycles[0][0].name == "quine"
+        assert g.nodes[0].outgoing[0].cyclic
     }
 
     @Test
@@ -38,8 +39,11 @@ class GraphCycleDetectionTest {
         Graph g = new Graph(sr)
         g.initCycles()
         assert g.cycles.size() == 1
-        g.cycles[0].size() == 2
-        g.cycles[0].collect {it.name}.containsAll (["primus", "secundus"])
+        assert g.cycles[0].size() == 2
+        assert g.cycles[0].collect {it.name}.containsAll (["primus", "secundus"])
+        g.nodes.collect {it.outgoing}.flatten().each {
+           assert it.cyclic
+        }
     }
 
     @Test
@@ -73,6 +77,37 @@ class GraphCycleDetectionTest {
         assert tertiusCycle
         assert tertiusCycle.size() == 2
         assert tertiusCycle.collect {it.name}.contains("primus")
+
+        g.nodes.collect {it.outgoing}.flatten().each {
+            assert it.cyclic
+        }
+
+    }
+
+    @Test
+    void discardNodesThatArentPartOfACycle() {
+        SourceRepository sr = new SourceRepositoryForTesting({
+            project {
+                name = "primus"
+                depends("secundus")
+            }
+            project {
+                name = "secundus"
+                depends ("tertius")
+            }
+            project {
+                name = "tertius"
+                depends ("secundus")
+            }
+        })
+
+        Graph g = new Graph(sr)
+        g.initCycles()
+        assert g.cycles.size() == 1
+
+        assert g.cycles[0].collect {it.name}.containsAll (["tertius", "secundus"])
+
+        assert !g.nodes.find { it.name == "primus" }.outgoing.first().cyclic
 
     }
 
@@ -141,6 +176,10 @@ class GraphCycleDetectionTest {
         assert tertiusCycle
         assert tertiusCycle.size() == 2
         assert tertiusCycle.collect {it.name}.contains("quartus")
+
+        g.nodes.collect {it.outgoing}.flatten().each {
+            assert it.cyclic
+        }
     }
 
     @Test

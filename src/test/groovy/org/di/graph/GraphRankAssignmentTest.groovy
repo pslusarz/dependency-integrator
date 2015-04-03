@@ -73,4 +73,59 @@ class GraphRankAssignmentTest {
         g.initRank()
         assert g.nodes.find {it.name == "primus"}.rank == 3
     }
+
+    @Test
+    void testSimpleCycle() {
+        SourceRepository sr = new SourceRepositoryForTesting({
+            project {
+                name = "primus"
+                depends ("secundus")
+            }
+
+            project {
+                name = "secundus"
+                depends ("tertius")
+            }
+
+            project {
+                name = "tertius"
+                depends ("primus")
+            }
+        })
+
+        Graph g = new Graph(sr)
+
+        g.initRank()
+        assert g.nodes.find {it.name == "primus"}.rank == 1
+        assert g.nodes.find {it.name == "secundus"}.rank == 1
+        assert g.nodes.find {it.name == "tertius"}.rank == 1
+    }
+
+    @Test
+    void testIgnoreCycleEdgesWhenAssigningRank() {
+        SourceRepository sr = new SourceRepositoryForTesting({
+            project {
+                name = "primus"
+                depends ("secundus")
+            }
+
+            project {
+                name = "secundus"
+                depends ("primus")
+                depends ("tertius")
+            }
+
+            project {
+                name = "tertius"
+            }
+        })
+
+        Graph g = new Graph(sr)
+
+        g.initRank()
+        assert g.nodes.find {it.name == "primus"}.rank == 1
+        assert g.nodes.find {it.name == "secundus"}.rank == 2
+        assert g.nodes.find {it.name == "tertius"}.rank == 1
+    }
+
 }

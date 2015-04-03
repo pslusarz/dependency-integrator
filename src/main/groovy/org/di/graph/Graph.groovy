@@ -33,7 +33,9 @@ class Graph {
         while (!stack.isEmpty()) {
             def current = stack.pop()
             if (current.path.collect { it.name }.contains(current.node.name)) {
-                cycles << current.path.drop(current.path.indexOf(current.node))
+                def cycle = current.path.drop(current.path.indexOf(current.node))
+                cycles << cycle
+                markEdgesCyclic(cycle)
                 // a, b, c, b, c... -> 'a' is not part of the cycle
             } else if (!visited.contains(current.node)) {
                 current.node.outgoing.collect { it.to }.each { Node dependency ->
@@ -50,21 +52,32 @@ class Graph {
 
     }
 
+    private static markEdgesCyclic(List<Node> cycle) {
+        Node previous = null
+        cycle.each { Node node ->
+            if (previous) {
+                previous.outgoing.find { it.to == node }.cyclic = true
+            }
+            previous = node
+        }
+        cycle.last().outgoing.find { it.to == cycle.first() }.cyclic = true
+    }
+
     def initRank() {
-//        if (!cycles) {
-//            initCycles()
-//        }
+        if (!cycles) {
+            initCycles()
+        }
         def changed = true
         while (changed) {
             changed = false
             nodes.each {
-                if (it.outgoing.size() == 0) {
+                if (it.outgoing.findAll{!it.cyclic}.size() == 0) {
                     if (it.rank == -1) {
                         it.rank = 1
                         changed = true
                     }
-                } else if (!it.outgoing.findAll { it.to.rank == -1 }) {
-                    def newRank = (it.outgoing.collect{it.to}.max { a, b -> a.rank <=> b.rank }).rank + 1
+                } else if (!it.outgoing.findAll{!it.cyclic}.findAll { it.to.rank == -1 }) {
+                    def newRank = (it.outgoing.findAll{!it.cyclic}.collect { it.to }.max { a, b -> a.rank <=> b.rank }).rank + 1
                     if (newRank != it.rank) {
                         changed = true
                         it.rank = newRank
