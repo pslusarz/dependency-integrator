@@ -18,7 +18,7 @@ class Graph {
             node.projectSource.dependencies.findAll {
                 nodes.collect { it.name }.contains(it.projectSourceName)
             }.each { Dependency dependency ->
-                node.outgoing << new Edge(to: nodes.find { it.name == dependency.projectSourceName })
+                node.outgoing << new Edge(to: nodes.find { it.name == dependency.projectSourceName }, dependency: dependency)
             }
         }
     }

@@ -1,5 +1,8 @@
 apply plugin: 'java'
 apply plugin: 'groovy'
+apply plugin: 'application'
+
+mainClassName = 'org.di.api.impl.Main'
 
 sourceCompatibility = 1.5
 version = '1.0'
