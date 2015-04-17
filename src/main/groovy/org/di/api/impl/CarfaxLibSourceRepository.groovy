@@ -6,7 +6,17 @@ import org.di.api.SourceRepository
 
 class CarfaxLibSourceRepository implements SourceRepository {
     File localDir
-
+    List<String> projectNames = [
+            'aamva-authentication-client',
+       'aamva-consumer-access-client',
+       'alert-log-domain',
+       'amqp-configuration-domain',
+       'answer-delivery-domain',
+       'auction-partner-internal',
+       'bbg-domain',
+       'bmc-impact-service',
+       'build-levels'
+    ]
 
     @Override
     Collection<ProjectSource> init() {
@@ -29,6 +39,18 @@ class CarfaxLibSourceRepository implements SourceRepository {
 
     @Override
     void downloadAll() {
+        if (localDir.exists()) {
+            File original = new File(localDir.getCanonicalPath())
+            original.renameTo(new File(localDir.parentFile, localDir.name+"-"+System.currentTimeMillis()) )
+
+        }
+        localDir.mkdirs()
+        projectNames.collect() { String projectName ->
+
+            String cmd ="cmd /c git clone ssh://git@stash:7999/lib/${projectName}.git ${localDir.absolutePath.replaceAll("\\\\", "/")+'/'+projectName}"
+            println cmd
+            cmd.execute()
+        }.each {it.waitFor()}
 
     }
 

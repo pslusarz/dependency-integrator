@@ -7,12 +7,10 @@ import org.di.graph.Graph
 public class Main {
     public static void main(String... args) {
         SourceRepository repository = new CarfaxLibSourceRepository(localDir: new File("D:/hackathon"));
-        Graph g = new Graph(repository)
-        g.initRank()
-        drawRank(g)
-//        repository.init().each {
-//            println it.name + " "+it.version
-//        }
+        repository.downloadAll()
+//        Graph g = new Graph(repository)
+//        g.initRank()
+//        drawRank(g)
 
     }
 
