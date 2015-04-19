@@ -30,6 +30,7 @@ class GraphVizGenerator {
     }
 
     def generate() {
+        graph.initRank()
         String content = "digraph G { ranksep=3; nodesep=0.1; node [shape=point,width=.75,height=.5,fontsize=5];\n"
         def levels = graph.nodes.groupBy {it.rank}.keySet().sort{-it}
         content += "  {  node [shape=none]; edge [style=invis]; \n"

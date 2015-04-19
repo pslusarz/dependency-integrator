@@ -29,6 +29,7 @@ class GraphVizGeneratorTest {
         assert !gvg.script.exists()
         assert !gvg.graphic.exists()
         gvg.generate()
+        assert g.nodes.find{it.name == "primus"}.rank == 3
         assert gvg.script.exists()
         assert gvg.script.text.contains("digraph")
         assert gvg.script.text.contains("primus")
