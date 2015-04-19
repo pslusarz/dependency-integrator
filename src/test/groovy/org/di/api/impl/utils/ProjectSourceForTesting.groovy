@@ -11,6 +11,8 @@ class ProjectSourceForTesting implements ProjectSource {
     String name
     int version = 1
     List<DependencyForTesting> dependencies = []
+    boolean buildShouldWork = true
+    long buildTimeMillis = 0
 
     ProjectSourceForTesting(Closure config) {
         config.delegate = this
@@ -62,6 +64,7 @@ class ProjectSourceForTesting implements ProjectSource {
 
     @Override
     boolean build() {
-        return false
+        sleep(buildTimeMillis)
+        return buildShouldWork
     }
 }
