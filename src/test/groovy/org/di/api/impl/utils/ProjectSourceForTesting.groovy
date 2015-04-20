@@ -64,7 +64,7 @@ class ProjectSourceForTesting implements ProjectSource {
 
     @Override
     boolean build() {
-        sleep(buildTimeMillis)
+        Thread.currentThread().sleep(buildTimeMillis)
         return buildShouldWork
     }
 }

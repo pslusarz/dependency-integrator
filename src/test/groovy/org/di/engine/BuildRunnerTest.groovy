@@ -44,4 +44,23 @@ class BuildRunnerTest {
         assert results.find {it.projectSource.name == "one"}.result == BuildRecord.BuildResult.Passed
         assert results.find {it.projectSource.name == "two"}.result == BuildRecord.BuildResult.Failed
     }
+
+    @Test
+    void testBuildsAreRunInParallel() {
+        def runtimes = [103, 45, 67, 115, 98, 325, 75, 245, 90, 12, 172, 55]
+        def projects = runtimes.collect { int runtime ->
+            new ProjectSourceForTesting({
+                name = "project-"+runtime.toString()
+                buildTimeMillis = runtime
+            })
+        }
+        BuildRunner br = new BuildRunner(projectSources: projects)
+        def start = System.currentTimeMillis()
+        br.start()
+        def results = br.completeBuildRecords
+        def stop = System.currentTimeMillis()
+
+        assert results.sum {it.runTimeMillis} >= runtimes.sum()
+        assert (stop-start) < runtimes.sum()
+    }
 }
