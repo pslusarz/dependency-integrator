@@ -13,7 +13,7 @@ class BuildRunner {
     ExecutorService executor
     def start() {
        buildRecords.addAll(projectSources.collect {new BuildRecord(projectSource: it)})
-       executor = Executors.newFixedThreadPool(projectSources.size())
+       executor = Executors.newFixedThreadPool(10)
         buildRecords.each { record ->
           record.startEpoch = System.currentTimeMillis()
           executor.execute(new BuildRun(buildRecord: record))

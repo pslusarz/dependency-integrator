@@ -109,6 +109,11 @@ class CarfaxGradleProjectSource implements ProjectSource {
 
     @Override
     boolean build() {
-        return false
+        String cmd = "cmd /c ${projectDirectory.absolutePath}\\gradlew.bat build"
+        def proc = cmd.execute()
+        //proc.consumeProcessOutput()
+        //synchronized (this) {println proc.text}
+        proc.waitFor()
+        return true
     }
 }
