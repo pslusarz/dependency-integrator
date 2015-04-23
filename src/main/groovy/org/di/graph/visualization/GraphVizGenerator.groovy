@@ -19,7 +19,7 @@ class GraphVizGenerator {
         graphic = new File(System.getProperty("java.io.tmpdir")+"/di.${outputType}")
         graphic.delete()
         if (System.getProperty("os.name").startsWith("Windows")) {
-           dotCommandLocation = "C:\\cfx)\\graphviz\\bin\\dot.exe"
+           dotCommandLocation = "C:\\cfx\\graphviz\\bin\\dot.exe"
             commandExecutionPrefix = "cmd /c "
             commandOpenPrefix = ""
         } else {
@@ -62,7 +62,9 @@ class GraphVizGenerator {
         content += "}"
         script.delete()
         script << content
-        def proc = """${commandExecutionPrefix}${dotCommandLocation} -Tpng ${script.absolutePath} -o ${graphic.absolutePath}""".execute()
+        String command = """${commandExecutionPrefix}${dotCommandLocation} -Tpng ${script.absolutePath} -o ${graphic.absolutePath}"""
+        println " using the following graphviz command: $command"
+        def proc = command.execute()
         proc.waitFor()
 
     }
