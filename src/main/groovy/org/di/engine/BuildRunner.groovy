@@ -25,6 +25,11 @@ class BuildRunner {
         executor.shutdown()
         while (!executor.terminated) {
             executor.awaitTermination(10, TimeUnit.SECONDS)
+            println "---------------------"
+            buildRecords.findAll {it.result == BuildRecord.BuildResult.Unknown}.each {
+                println "Still running: "+it.projectSource.name
+            }
+
         }
         def result = []
         result.addAll(buildRecords)

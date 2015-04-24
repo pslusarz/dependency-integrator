@@ -9,7 +9,7 @@ import org.di.graph.visualization.GraphVizGenerator
 public class Main {
     public static void main(String... args) {
         SourceRepository repository = new CarfaxLibSourceRepository(localDir: new File("D:/hackathon"));
-        //repository.downloadAll()
+        repository.downloadAll()
         //Graph g = new Graph(repository)
         //g.initRank()
 //        g.cycles.each {

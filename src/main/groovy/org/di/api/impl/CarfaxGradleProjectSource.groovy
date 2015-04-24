@@ -109,11 +109,19 @@ class CarfaxGradleProjectSource implements ProjectSource {
 
     @Override
     boolean build() {
-        String cmd = "cmd /c ${projectDirectory.absolutePath}\\gradlew.bat build"
-        def proc = cmd.execute()
-        //proc.consumeProcessOutput()
-        //synchronized (this) {println proc.text}
-        proc.waitFor()
-        return true
+        File output = new File(System.getProperty("java.io.tmpdir"), "out-"+projectDirectory.name+".txt")
+        File buildFile = new File(projectDirectory, "build.gradle")
+        if (buildFile.exists()) {
+            String cmd = "cmd /c ${projectDirectory.absolutePath}\\gradlew.bat --build-file ${buildFile.absolutePath} clean build >${output.absolutePath}"
+            //--gradle-user-home ${projectDirectory.absolutePath}\\.gradle
+            def proc = cmd.execute()
+            //proc.consumeProcessOutput()
+            //synchronized (this) {println proc.text}
+            proc.waitFor()
+
+            return output.text.contains("BUILD SUCCESSFUL")
+        } else {
+            return false
+        }
     }
 }
