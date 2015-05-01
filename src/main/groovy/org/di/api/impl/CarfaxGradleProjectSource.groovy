@@ -7,6 +7,7 @@ import org.di.api.Version
 
 class CarfaxGradleProjectSource implements ProjectSource {
     private final File projectDirectory;
+    private Version version
 
     public CarfaxGradleProjectSource(File projectDirectory) {
         this.projectDirectory = projectDirectory
@@ -35,6 +36,23 @@ class CarfaxGradleProjectSource implements ProjectSource {
 
     @Override
     Version getVersion() {
+        if (!version) {
+            String cmd = "cmd /c git --git-dir=${projectDirectory.absolutePath}\\.git --no-pager --work-tree=${projectDirectory.absolutePath} log master -5 --tags --grep=release --pretty=oneline"
+            def proc = cmd.execute()
+            proc.waitFor()
+            List<String> versions = (proc.text).trim().split("\n")
+            List<String> gitLogLineChunks = versions.first().split(" ")
+            if (gitLogLineChunks.size() > 2) {
+                version = new StringMajorMinorPatchVersion(gitLogLineChunks[-3] - "-SNAPSHOT")
+            } else {
+                println "NO TAG FOR ${name}"
+                version = new StringMajorMinorPatchVersion("1.0.0")
+            }
+        }
+        return version
+    }
+
+    Version getVersionFromProperties() {
         def props = new Properties()
         props.load(new File(projectDirectory, "gradle.properties").newReader())
         assert props.version

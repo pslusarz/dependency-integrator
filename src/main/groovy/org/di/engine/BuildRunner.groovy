@@ -11,9 +11,9 @@ class BuildRunner {
     List<ProjectSource> projectSources
     List<BuildRecord> buildRecords = new CopyOnWriteArrayList<>()
     ExecutorService executor
-    def start() {
+    def start(int numberOfThreads = 10) {
        buildRecords.addAll(projectSources.collect {new BuildRecord(projectSource: it)})
-       executor = Executors.newFixedThreadPool(10)
+       executor = Executors.newFixedThreadPool(numberOfThreads)
         buildRecords.each { record ->
           record.startEpoch = System.currentTimeMillis()
           executor.execute(new BuildRun(buildRecord: record))
