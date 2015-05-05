@@ -1,10 +1,11 @@
 package org.di.api.impl
 
+import groovy.util.logging.Log
 import org.di.api.Dependency
 import org.di.api.ProjectSource
 import org.di.api.Version
 
-
+@Log
 class CarfaxGradleProjectSource implements ProjectSource {
     private final File projectDirectory;
     private Version version
@@ -45,8 +46,8 @@ class CarfaxGradleProjectSource implements ProjectSource {
             if (gitLogLineChunks.size() > 2) {
                 version = new StringMajorMinorPatchVersion(gitLogLineChunks[-3] - "-SNAPSHOT")
             } else {
-                println "NO TAG FOR ${name}"
-                version = new StringMajorMinorPatchVersion("1.0.0")
+                log.warning "NO TAG FOR ${name}, trying version from properties"
+                version = getVersionFromProperties()
             }
         }
         return version
@@ -130,7 +131,7 @@ class CarfaxGradleProjectSource implements ProjectSource {
         File output = new File(System.getProperty("java.io.tmpdir"), "out-"+projectDirectory.name+".txt")
         File buildFile = new File(projectDirectory, "build.gradle")
         if (buildFile.exists()) {
-            String cmd = "cmd /c ${projectDirectory.absolutePath}\\gradlew.bat --build-file ${buildFile.absolutePath} clean build >${output.absolutePath}"
+            String cmd = "cmd /c ${projectDirectory.absolutePath}\\gradlew.bat --build-file ${buildFile.absolutePath} --gradle-user-home ${projectDirectory.absolutePath} clean build >${output.absolutePath}"
             //--gradle-user-home ${projectDirectory.absolutePath}\\.gradle
             def proc = cmd.execute()
             //proc.consumeProcessOutput()
