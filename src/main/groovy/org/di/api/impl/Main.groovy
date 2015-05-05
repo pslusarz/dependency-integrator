@@ -19,20 +19,20 @@ public class Main {
 //                gv.generate()
 //        gv.reveal()
         def projects = repository.init()
-        projects.each {
-            println it.version
+//        projects.each {
+//            println it.version
+//        }
+
+        long start = System.currentTimeMillis()
+        BuildRunner br = new BuildRunner(projectSources: projects)
+        br.start(5)
+        def results = br.completeBuildRecords
+        long stop = System.currentTimeMillis()
+        results.each {
+            println it.projectSource.name +" "+it.result
         }
 
-//        long start = System.currentTimeMillis()
-//        BuildRunner br = new BuildRunner(projectSources: projects[0..10])
-//        br.start(5)
-//        def results = br.completeBuildRecords
-//        long stop = System.currentTimeMillis()
-//        results.each {
-//            println it.projectSource.name +" "+it.result
-//        }
-//
-//        println "Total time (ms): "+(stop - start)
+        println "Total time (ms): "+(stop - start)
 
 
     }

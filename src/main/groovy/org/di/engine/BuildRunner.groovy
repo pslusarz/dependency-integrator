@@ -26,9 +26,12 @@ class BuildRunner {
         while (!executor.terminated) {
             executor.awaitTermination(10, TimeUnit.SECONDS)
             println "---------------------"
-            buildRecords.findAll {it.result == BuildRecord.BuildResult.Unknown}.each {
-                println "Still running: "+it.projectSource.name
-            }
+            def running = buildRecords.findAll {it.result == BuildRecord.BuildResult.Unknown}.collect{it.projectSource.name}
+            def passed = buildRecords.findAll {it.result == BuildRecord.BuildResult.Passed}.collect{it.projectSource.name}
+            def failed = buildRecords.findAll {it.result == BuildRecord.BuildResult.Failed}.collect{it.projectSource.name}
+            println "Passed: ${passed.size()}, Failed: ${failed.size()}, Running: ${running.size()}"
+            println "    Failed: "+failed
+            println "   Running: "+running
 
         }
         def result = []
