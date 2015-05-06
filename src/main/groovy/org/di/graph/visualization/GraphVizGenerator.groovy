@@ -8,6 +8,7 @@ class GraphVizGenerator {
     File script
     File graphic
     //see: http://www.graphviz.org/doc/info/output.html
+    //     http://www.graphviz.org/doc/info/attrs.html
     String outputType = "png"
     String dotCommandLocation
     String commandExecutionPrefix
@@ -66,6 +67,8 @@ class GraphVizGenerator {
         println " using the following graphviz command: $command"
         def proc = command.execute()
         proc.waitFor()
+        println proc.in.text
+        println proc.err.text
 
     }
 

@@ -92,7 +92,8 @@ class CarfaxGradleProjectSource implements ProjectSource {
         lines.findAll { it.contains('carfax:') }.each { line -> // compile 'carfax:serialization-extensions:3.1.1'
             String depChunk = line.split(/['|"]/)[1] //carfax:serialization-extensions:3.1.1
             String[] depChunk2 = depChunk.split(':')
-            result << new CarfaxJarDependency(depChunk2[1], new org.di.api.impl.StringMajorMinorPatchVersion(depChunk2[2]))
+            def dep = new CarfaxJarDependency(depChunk2[1], new org.di.api.impl.StringMajorMinorPatchVersion(depChunk2[2]), CarfaxJarDependency.DependencySource.buildfile)
+            result << dep
 
         }
 
@@ -110,7 +111,8 @@ class CarfaxGradleProjectSource implements ProjectSource {
                 if (line) {
                     String[] parts = line.split("=");
                     if (parts.length == 2) {
-                        dependencies.add(new CarfaxJarDependency(parts[0], new StringMajorMinorPatchVersion(parts[1])));
+                        def dep = new CarfaxJarDependency(parts[0], new StringMajorMinorPatchVersion(parts[1]), CarfaxJarDependency.DependencySource.properties)
+                        dependencies.add(dep);
                     }
                 }
             }

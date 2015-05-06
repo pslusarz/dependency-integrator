@@ -6,10 +6,13 @@ import org.di.api.Version
 class CarfaxJarDependency implements Dependency {
     private final String name;
     private final Version version;
+    enum DependencySource {buildfile, properties}
+    DependencySource source
 
-    CarfaxJarDependency(String name, Version version) {
+    CarfaxJarDependency(String name, Version version, DependencySource source) {
         this.name = name;
         this.version = version;
+        this.source = source
     }
 
     @Override

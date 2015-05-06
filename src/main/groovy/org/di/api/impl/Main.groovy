@@ -11,9 +11,9 @@ public class Main {
     public static void main(String... args) {
         SourceRepository repository = new CarfaxLibSourceRepository(localDir: new File("D:/hackathon"));
         // repository.downloadAll()
-        //drawGraph(repository)
-        def projects = repository.init()
-        buildAll(projects)
+        drawGraph(repository)
+        //def projects = repository.init()
+        //buildAll(projects)
 
 
     }
