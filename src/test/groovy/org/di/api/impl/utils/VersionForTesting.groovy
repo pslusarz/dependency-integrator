@@ -1,9 +1,11 @@
 package org.di.api.impl.utils
 
+import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
 import org.di.api.Version
 
 @ToString(includePackage = false)
+@EqualsAndHashCode
 class VersionForTesting implements Version {
 
     int value
