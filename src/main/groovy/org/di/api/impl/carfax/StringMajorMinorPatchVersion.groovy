@@ -49,7 +49,7 @@ public class StringMajorMinorPatchVersion implements Version {
     @Override
     public boolean before(Version other) {
         assert other instanceof StringMajorMinorPatchVersion
-        return other.major > major
+        return other.asLong() > this.asLong()
     }
 
     @Override
@@ -64,6 +64,10 @@ public class StringMajorMinorPatchVersion implements Version {
           result = value == o.value
         }
         result
+    }
+
+    private long asLong(){
+        1000000 * major + 10000 * minor + patch
     }
 
     @Override

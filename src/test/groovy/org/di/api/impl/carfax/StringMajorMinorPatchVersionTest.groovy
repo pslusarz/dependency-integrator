@@ -1,6 +1,5 @@
 package org.di.api.impl.carfax
 
-import org.junit.Ignore
 import org.junit.Test
 
 class StringMajorMinorPatchVersionTest {
@@ -8,6 +7,22 @@ class StringMajorMinorPatchVersionTest {
     void testComparisonMajorVersions() {
         StringMajorMinorPatchVersion smaller = new StringMajorMinorPatchVersion("1.0.0")
         StringMajorMinorPatchVersion bigger = new StringMajorMinorPatchVersion("2.0.0")
+        assert smaller.before(bigger)
+        assert bigger.after(smaller)
+    }
+
+    @Test
+    void testComparisonMinorVersions() {
+        StringMajorMinorPatchVersion smaller = new StringMajorMinorPatchVersion("2.0.0")
+        StringMajorMinorPatchVersion bigger = new StringMajorMinorPatchVersion("2.1.0")
+        assert smaller.before(bigger)
+        assert bigger.after(smaller)
+    }
+
+    @Test
+    void testComparisonPatchVersions() {
+        StringMajorMinorPatchVersion smaller = new StringMajorMinorPatchVersion("22.0.44")
+        StringMajorMinorPatchVersion bigger = new StringMajorMinorPatchVersion("22.0.45")
         assert smaller.before(bigger)
         assert bigger.after(smaller)
     }
