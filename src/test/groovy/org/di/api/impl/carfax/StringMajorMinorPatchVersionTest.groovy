@@ -4,12 +4,21 @@ import org.junit.Ignore
 import org.junit.Test
 
 class StringMajorMinorPatchVersionTest {
-    @Test @Ignore
+    @Test
     void testComparisonMajorVersions() {
         StringMajorMinorPatchVersion smaller = new StringMajorMinorPatchVersion("1.0.0")
         StringMajorMinorPatchVersion bigger = new StringMajorMinorPatchVersion("2.0.0")
         assert smaller.before(bigger)
         assert bigger.after(smaller)
+    }
+
+    @Test
+    void testEquals() {
+        StringMajorMinorPatchVersion one = new StringMajorMinorPatchVersion("10.34.99")
+        StringMajorMinorPatchVersion two = new StringMajorMinorPatchVersion("10.34.99")
+        assert !one.before(two)
+        assert !two.after(one)
+        assert one == two
     }
 
     @Test

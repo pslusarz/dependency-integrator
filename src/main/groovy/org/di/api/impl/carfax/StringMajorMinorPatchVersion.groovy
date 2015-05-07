@@ -12,20 +12,29 @@ public class StringMajorMinorPatchVersion implements Version {
         String k = v
         if (k.contains("-SNAPSHOT")) {
           k = k-'-SNAPSHOT'
-          String[] chunks = k.split(/\./)
-          int[] versions = chunks.collect {Integer.parseInt(it)} .toArray()
+          int[] versions = mmpFromString(k)
             if (versions[2]==0) {
                 versions[1] = versions[1]-1
             } else (
               versions[2] = versions[2]-1
             )
             k = versions.collect {it.toString()}.join(".")
-            major = versions[0]
-            minor = versions[1]
-            patch = versions[2]
-
+            assignMMP(versions)
+        } else {
+            assignMMP(mmpFromString(v))
         }
         this.value = k;
+    }
+
+    private assignMMP(int[] versions) {
+        major = versions[0]
+        minor = versions[1]
+        patch = versions[2]
+    }
+
+    private static int[] mmpFromString(String input) {  // "2.3.4"
+        input.split(/\./).collect {Integer.parseInt(it)}.toArray()
+
     }
 
     public String getValue() {
@@ -39,12 +48,27 @@ public class StringMajorMinorPatchVersion implements Version {
 
     @Override
     public boolean before(Version other) {
-        return false
+        assert other instanceof StringMajorMinorPatchVersion
+        return other.major > major
     }
 
     @Override
     public boolean after(Version other) {
-        return false;
+        return !before(other) && !equals(other);
+    }
+
+    @Override
+    boolean equals(Object o) {
+        boolean result = false
+        if (o instanceof StringMajorMinorPatchVersion) {
+          result = value == o.value
+        }
+        result
+    }
+
+    @Override
+    public int hashCode() {
+        value.hashCode()
     }
 
     @Override
