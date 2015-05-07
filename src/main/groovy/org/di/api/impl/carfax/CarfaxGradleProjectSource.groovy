@@ -1,4 +1,4 @@
-package org.di.api.impl
+package org.di.api.impl.carfax
 
 import groovy.util.logging.Log
 import org.di.api.Dependency
@@ -92,7 +92,7 @@ class CarfaxGradleProjectSource implements ProjectSource {
         lines.findAll { it.contains('carfax:') }.each { line -> // compile 'carfax:serialization-extensions:3.1.1'
             String depChunk = line.split(/['|"]/)[1] //carfax:serialization-extensions:3.1.1
             String[] depChunk2 = depChunk.split(':')
-            def dep = new CarfaxJarDependency(depChunk2[1], new org.di.api.impl.StringMajorMinorPatchVersion(depChunk2[2]), CarfaxJarDependency.DependencySource.buildfile)
+            def dep = new CarfaxJarDependency(depChunk2[1], new StringMajorMinorPatchVersion(depChunk2[2]), CarfaxJarDependency.DependencySource.buildfile)
             result << dep
 
         }
