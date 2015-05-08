@@ -7,4 +7,7 @@ class Edge {
     Node to
     Dependency dependency
     boolean cyclic = false
+    boolean isStale() {
+        dependency.version.toString() != to.projectSource.version.toString()
+    }
 }

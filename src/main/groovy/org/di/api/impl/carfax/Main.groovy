@@ -1,5 +1,6 @@
 package org.di.api.impl.carfax
 
+import org.di.api.ProjectSource
 import org.di.api.SourceRepository
 import org.di.engine.BuildRecord
 import org.di.engine.BuildRunner
@@ -11,11 +12,20 @@ public class Main {
     public static void main(String... args) {
         SourceRepository repository = new CarfaxLibSourceRepository(localDir: new File("D:/hackathon"));
         // repository.downloadAll()
-        drawGraph(repository)
-        //def projects = repository.init()
+        //drawGraph(repository)
+        def projects = repository.init()
+        updateLevel(repository, 2)
         //buildAll(projects)
 
 
+    }
+
+    static updateLevel(SourceRepository repository, int rank) {
+        Graph g = new Graph(repository)
+        g.initRank()
+        g.nodes.findAll {it.rank == rank} {
+
+        }
     }
 
     static buildAll(projects) {

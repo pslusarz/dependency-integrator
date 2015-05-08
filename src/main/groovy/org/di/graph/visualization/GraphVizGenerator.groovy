@@ -49,7 +49,7 @@ class GraphVizGenerator {
         graph.nodes.each { node ->
             node.outgoing.each { dependency ->
                 String edgeStyle = ""
-                if (dependency.dependency.version.toString() != dependency.to.projectSource.version.toString() ) {
+                if (dependency.isStale() ) {
                     edgeStyle =  "[color=red,style=\"setlinewidth(4)\"]"
                     println node.projectSource.name + " depends on "+dependency.to.name + " version "+dependency.dependency.version.toString()+ " ("+dependency.to.projectSource.version.toString()+")"
                 }
