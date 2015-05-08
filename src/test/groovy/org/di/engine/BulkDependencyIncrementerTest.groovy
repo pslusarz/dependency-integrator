@@ -24,6 +24,19 @@ class BulkDependencyIncrementerTest {
     }
 
     @Test
+    void handleNonExistantDependency() {
+        def projects = [
+                new ProjectSourceForTesting({
+                    name = "one"
+                    depends ("two", 1)
+
+                })
+        ]
+        new BulkDependencyIncrementer(projectSource: projects.find {it.name == "one"}, projectSources: projects).increment()
+        assert projects.find {it.name == "one"}.dependencies.find{it.projectSourceName == "two"}.version == new VersionForTesting(value: 1)
+    }
+
+    @Test
     void testHandleCurrentDependency() {
         def projects = [
                 new ProjectSourceForTesting({

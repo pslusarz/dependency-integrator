@@ -15,6 +15,11 @@ class CarfaxGradleProjectSource implements ProjectSource {
     }
 
     @Override
+    String toString() {
+        projectDirectory.name
+    }
+
+    @Override
     String getName() {
         return projectDirectory.name
     }
@@ -83,7 +88,17 @@ class CarfaxGradleProjectSource implements ProjectSource {
 
     @Override
     void setDependencyVersion(Dependency dependency, Version newVersion) {
+        if (dependency.source == CarfaxJarDependency.DependencySource.properties) {
+            Properties props = new Properties()
+            File depsFile = new File(projectDirectory, "dependencies.properties")
 
+            props.load(depsFile.newInputStream())
+            props.store(new File(projectDirectory, "old-dependencies.properties").newOutputStream(),"backup before dependency update")
+            props[dependency.projectSourceName] = newVersion.toString()
+            props.store(new File(projectDirectory, "dependencies.properties").newOutputStream(), "updated with dependency updater")
+        } else {
+            log.warning "I don't know yet how to update build.gradle dependencies in ${name}: "+dependency.projectSourceName
+        }
     }
 
     def parseFromBuildGradle() {
@@ -130,7 +145,7 @@ class CarfaxGradleProjectSource implements ProjectSource {
 
     @Override
     boolean build() {
-        File output = new File(System.getProperty("java.io.tmpdir"), "out-"+projectDirectory.name+".txt")
+        File output = new File(System.getProperty("java.io.tmpdir"), "out-" + projectDirectory.name + ".txt")
         File buildFile = new File(projectDirectory, "build.gradle")
         if (buildFile.exists()) {
             String cmd = "cmd /c ${projectDirectory.absolutePath}\\gradlew.bat --build-file ${buildFile.absolutePath} --gradle-user-home ${projectDirectory.absolutePath} clean build >${output.absolutePath}"

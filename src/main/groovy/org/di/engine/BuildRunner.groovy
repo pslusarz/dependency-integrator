@@ -8,7 +8,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 class BuildRunner {
-    List<ProjectSource> projectSources
+    Collection<ProjectSource> projectSources
     List<BuildRecord> buildRecords = new CopyOnWriteArrayList<>()
     ExecutorService executor
     def start(int numberOfThreads = 10) {

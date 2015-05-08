@@ -11,7 +11,8 @@ class BulkDependencyIncrementer {
 
     void increment() {
         projectSource.dependencies.each { Dependency dependency ->
-            if (dependency.version.before(projectSources.find { it.name == dependency.projectSourceName }.version)) {
+            def isPhantomDependency = !projectSources.find { it.name == dependency.projectSourceName }
+            if (!isPhantomDependency && dependency.version.before(projectSources.find { it.name == dependency.projectSourceName }.version)) {
                 originalVersions[dependency] = dependency.version
                 projectSource.setDependencyVersion(dependency, projectSources.find {
                     it.name == dependency.projectSourceName
