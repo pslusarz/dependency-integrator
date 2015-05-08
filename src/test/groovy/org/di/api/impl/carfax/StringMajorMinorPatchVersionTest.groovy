@@ -44,4 +44,20 @@ class StringMajorMinorPatchVersionTest {
         StringMajorMinorPatchVersion snapshot2 = new StringMajorMinorPatchVersion("2.3.0-SNAPSHOT")
         assert snapshot2.toString() == "2.2.0"
     }
+
+    @Test
+    void handleUnderscores() {
+        StringMajorMinorPatchVersion version = new StringMajorMinorPatchVersion("1.9_2")
+        assert version.major == 1
+        assert version.minor == 9
+        assert version.patch == 2
+    }
+
+    @Test
+    void handleTwoComponentVersions() {
+        StringMajorMinorPatchVersion version = new StringMajorMinorPatchVersion("1.2004")
+        assert version.major == 1
+        assert version.minor == 2004
+        assert version.patch == 0
+    }
 }
