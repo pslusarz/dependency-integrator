@@ -8,6 +8,7 @@ import org.di.api.Version
 class DependencyForTesting implements Dependency{
     Version version
     String projectSourceName
+    private boolean _guarded = false
 
 
     @Override
@@ -27,6 +28,6 @@ class DependencyForTesting implements Dependency{
 
     @Override
     boolean isGuarded() {
-        return false
+        return _guarded
     }
 }

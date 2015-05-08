@@ -55,4 +55,16 @@ class ProjectSourceForTestingTest {
         project.setDependencyVersion(dependency, dependency.version)
         assert project.dependencies.find {it.projectSourceName == "yetanother"}
     }
+
+    @Test
+    void testSetDependencyGuarded() {
+        def project = new ProjectSourceForTesting({
+            name = "myproject"
+            depends("another", 1)
+        })
+        def dependencyOrig = project.dependencies.find {it.projectSourceName == "another"}
+        assert !dependencyOrig.guarded
+        project.setDependencyGuarded(dependencyOrig)
+        assert project.dependencies.find {"another"}.guarded
+    }
 }

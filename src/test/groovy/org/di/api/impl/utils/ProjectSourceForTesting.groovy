@@ -59,7 +59,8 @@ class ProjectSourceForTesting implements ProjectSource {
 
     @Override
     void setDependencyGuarded(Dependency dependency) {
-
+        dependencies.remove (dependencies.find {it.projectSourceName == dependency.projectSourceName})
+        dependencies << new DependencyForTesting(projectSourceName: dependency.projectSourceName, version: dependency.version, _guarded: true)
     }
 
     @Override
