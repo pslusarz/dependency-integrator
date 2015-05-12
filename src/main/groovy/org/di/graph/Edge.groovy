@@ -4,7 +4,7 @@ import org.di.api.Dependency
 import org.di.api.Version
 
 class Edge {
-    Node to
+    Node to, from
     Dependency dependency
     boolean cyclic = false
     boolean isStale() {

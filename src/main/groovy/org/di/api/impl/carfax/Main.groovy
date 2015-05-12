@@ -39,7 +39,7 @@ public class Main {
                println "   "+edge.dependency.projectSourceName + "  "+edge.dependency.version+" ("+edge.to.projectSource.version+")"
 
            }
-           def update = new BulkDependencyIncrementer(projectSource:  node.projectSource, projectSources: repository.init())
+           def update = new BulkDependencyIncrementer(node: node)
            updates[node.projectSource] = update
         }
         BuildRunner br = new BuildRunner(projectSources: updates.keySet())

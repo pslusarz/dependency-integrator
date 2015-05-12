@@ -1,63 +1,54 @@
 package org.di.engine
 
 import org.di.api.ProjectSource
+import org.di.api.SourceRepository
 import org.di.api.impl.utils.ProjectSourceForTesting
+import org.di.api.impl.utils.SourceRepositoryForTesting
 import org.di.api.impl.utils.VersionForTesting
+import org.di.graph.Graph
 import org.junit.Test
 
 class BulkDependencyIncrementerTest {
     @Test
     void testSingleDep() {
-        def projects = [
-                new ProjectSourceForTesting({
-                    name = "one"
-                    depends ("two", 1)
+        Graph g = new Graph(new SourceRepositoryForTesting({
+            project {
+                name = "one"
+                depends("two", 1)
+            }
+            project {
+                name = "two"
+                version = 2
+            }
+        }))
 
-                }),
-                new ProjectSourceForTesting({
-                    name = "two"
-                    version = 2
-                })
-        ]
-        new BulkDependencyIncrementer(projectSource: projects.find {it.name == "one"}, projectSources: projects).increment()
-        assert projects.find {it.name == "one"}.dependencies.find{it.projectSourceName == "two"}.version == new VersionForTesting(value: 2)
-    }
-
-    @Test
-    void handleNonExistantDependency() {
-        def projects = [
-                new ProjectSourceForTesting({
-                    name = "one"
-                    depends ("two", 1)
-
-                })
-        ]
-        new BulkDependencyIncrementer(projectSource: projects.find {it.name == "one"}, projectSources: projects).increment()
-        assert projects.find {it.name == "one"}.dependencies.find{it.projectSourceName == "two"}.version == new VersionForTesting(value: 1)
+        new BulkDependencyIncrementer(node: g.nodes.find { it.name == "one" }).increment()
+        assert g.rebuild().nodes.find {
+            it.name == "one"
+        }.outgoing[0].dependency.version == new VersionForTesting(value: 2)
     }
 
     @Test
     void testHandleCurrentDependency() {
-        def projects = [
-                new ProjectSourceForTesting({
-                    name = "one"
-                    depends ("current", 2)
-                    depends ("stale", 2)
-
-                }),
-                new ProjectSourceForTesting({
-                    name = "current"
-                    version = 2
-                }),
-                new ProjectSourceForTesting({
-                    name = "stale"
-                    version = 3
-                })
-        ]
-        def di = new BulkDependencyIncrementer(projectSource: projects.find {it.name == "one"}, projectSources: projects)
+        Graph g = new Graph(new SourceRepositoryForTesting({
+            project {
+                name = "one"
+                depends ("current", 2)
+                depends ("stale", 2)
+            }
+            project {
+                name = "current"
+                version = 2
+            }
+            project {
+                name = "stale"
+                version = 3
+            }
+        }))
+        def di = new BulkDependencyIncrementer(node: g.nodes.find { it.name == "one" })
         di.increment()
-        def currentDependency = projects.find {it.name == "one"}.dependencies.find{it.projectSourceName == "current"}
-        def staleDependency = projects.find {it.name == "one"}.dependencies.find{it.projectSourceName == "stale"}
+        def currentDependency = g.rebuild().nodes.find{it.name == "one"}.outgoing.find{it.to.name == "current"}.dependency //projects.find {it.name == "one"}.dependencies.find{it.projectSourceName == "current"}
+        def staleDependency = g.rebuild().nodes.find{it.name == "one"}.outgoing.find{it.to.name == "stale"}.dependency //projects.find {it.name == "one"}.dependencies.find{it.projectSourceName == "stale"}
         assert currentDependency.version == new VersionForTesting(value: 2)
         assert staleDependency.version == new VersionForTesting(value: 3)
 
@@ -65,27 +56,29 @@ class BulkDependencyIncrementerTest {
 
     @Test
     void testRollback() {
-        def projects = [
-                new ProjectSourceForTesting({
-                    name = "one"
-                    depends ("two", 1)
-                    depends ("three", 3)
-
-                }),
-                new ProjectSourceForTesting({
-                    name = "two"
-                    version = 2
-                }),
-                new ProjectSourceForTesting({
-                    name = "three"
-                    version = 3
-                })
-        ]
-        def di = new BulkDependencyIncrementer(projectSource: projects.find {it.name == "one"}, projectSources: projects)
+        Graph g = new Graph(new SourceRepositoryForTesting({
+            project {
+                name = "one"
+                depends ("current", 3)
+                depends ("stale", 1)
+            }
+            project {
+                name = "current"
+                version = 3
+            }
+            project {
+                name = "stale"
+                version = 2
+            }
+        }))
+        def di = new BulkDependencyIncrementer(node: g.nodes.find { it.name == "one" })
         di.increment()
         di.rollback()
-        def rolledbackDependency = projects.find {it.name == "one"}.dependencies.find{it.projectSourceName == "two"}
-        def untouchedDependency = projects.find {it.name == "one"}.dependencies.find{it.projectSourceName == "three"}
+
+        def rolledbackDependency = g.rebuild().nodes.find{it.name == "one"}.outgoing.find{it.to.name == "stale"}.dependency //projects.find {it.name == "one"}.dependencies.find{it.projectSourceName == "current"}
+        def untouchedDependency = g.rebuild().nodes.find{it.name == "one"}.outgoing.find{it.to.name == "current"}.dependency //projects.find {it.name == "one"}.dependencies.find{it.projectSourceName == "stale"}
+
+
         assert rolledbackDependency.version == new VersionForTesting(value: 1)
         assert rolledbackDependency.guarded
         assert untouchedDependency.version == new VersionForTesting(value: 3)
