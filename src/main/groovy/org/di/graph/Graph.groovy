@@ -5,13 +5,17 @@ import org.di.api.ProjectSource
 import org.di.api.SourceRepository
 
 class Graph {
-    SourceRepository sourceRepository
     List<Node> nodes = []
     List<List<Node>> cycles
 
-    Graph(sourceRepository) {
-        this.sourceRepository = sourceRepository
-        sourceRepository.init().each { ProjectSource project ->
+    Graph() {}
+
+    Graph(SourceRepository sourceRepository) {
+        this(sourceRepository.init())
+    }
+
+    Graph(Collection<ProjectSource> projectSources) {
+        projectSources.each { ProjectSource project ->
             nodes << new Node(projectSource: project)
         }
         nodes.each { Node node ->
@@ -24,7 +28,7 @@ class Graph {
     }
 
     Graph rebuild() {
-        return new Graph(sourceRepository)
+        return new Graph(nodes.collect{it.projectSource})
     }
 
     def initCycles() {

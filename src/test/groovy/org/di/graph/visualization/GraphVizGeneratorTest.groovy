@@ -25,11 +25,11 @@ class GraphVizGeneratorTest {
         })
 
         Graph g = new Graph(sr)
+        g.initRank()
         GraphVizGenerator gvg = new GraphVizGenerator(graph: g)
         assert !gvg.script.exists()
         assert !gvg.graphic.exists()
         gvg.generate()
-        assert g.nodes.find{it.name == "primus"}.rank == 3
         assert gvg.script.exists()
         assert gvg.script.text.contains("digraph")
         assert gvg.script.text.contains("primus")

@@ -1,7 +1,7 @@
 package org.di.graph.visualization
 
 import org.di.graph.Graph
-
+import org.di.graph.Node
 
 class GraphVizGenerator {
     Graph graph
@@ -31,7 +31,6 @@ class GraphVizGenerator {
     }
 
     def generate() {
-        graph.initRank()
         String content = "digraph G { ranksep=3; nodesep=0.1; node [shape=point,width=.75,height=.5,fontsize=5];\n"
         def levels = graph.nodes.groupBy {it.rank}.keySet().sort{-it}
         content += "  {  node [shape=none]; edge [style=invis]; \n"
@@ -42,7 +41,7 @@ class GraphVizGenerator {
 
         graph.nodes.groupBy {it.rank}.sort{-it.key}.each { rank, rankNodes ->
             content += "   { rank = same; ${rank};"
-            content += rankNodes.collect {fix(it.projectSource.name)}.join ("; ")
+            content += rankNodes.collect {drawNode(it)}.join (" ; ")
             content += "   }\n"
         }
 
@@ -78,5 +77,10 @@ class GraphVizGenerator {
 
     static String fix(String n) {
         n.replaceAll("-", "_")
+    }
+
+    static String drawNode(Node node) {
+        fix(node.projectSource.name) + (node.buildFailed ? " [color=red] " : "" )
+
     }
 }

@@ -5,6 +5,7 @@ import org.di.api.SourceRepository
 import org.di.engine.BuildRecord
 import org.di.engine.BuildRunner
 import org.di.engine.BulkDependencyIncrementer
+import org.di.engine.SpanningTreeBuilder
 import org.di.graph.Edge
 import org.di.graph.Graph
 import org.di.graph.Node
@@ -14,14 +15,8 @@ import org.di.graph.visualization.GraphVizGenerator
 public class Main {
     public static void main(String... args) {
         SourceRepository repository = new CarfaxLibSourceRepository(localDir: new File("D:/hackathon"));
-        // repository.downloadAll()
-        //drawGraph(repository)
-        def projects = repository.init()
-        //updateOne("carfax-websidestory", projects)
-        updateLevel(repository, 2)
-        //buildAll(projects)
 
-
+        blah(repository)
     }
 
     static updateOne(String projectName, Collection<ProjectSource> projects) {
@@ -60,6 +55,44 @@ public class Main {
             updates[it].rollback()
         }
     }
+
+
+
+    static blah(SourceRepository repository) {
+        Graph g = new Graph(repository)
+        Graph dependents = new Graph(new SpanningTreeBuilder(world: g, treeRoot: "dealerautoreports-commons").connectedProjects)
+        dependents.initRank()
+
+        BuildRunner br = new BuildRunner(projectSources: dependents.nodes.collect {it.projectSource} )
+        br.start(4)
+        def results = br.completeBuildRecords
+        results.findAll { it.result == BuildRecord.BuildResult.Failed }.each { currentBuild ->
+            dependents.nodes.find {it.name == currentBuild.projectSource.name }.buildFailed = true
+        }
+        def gv = new GraphVizGenerator(graph: dependents)
+        gv.generate()
+        gv.reveal()
+
+
+//        buildLevelsGraph.nodes.findAll {it.rank == 7}.each { Node current ->
+//            println current.name +"  "+ current.outgoing.size() + "  "+buildLevelsGraph.nodes.findAll {it.outgoing.find {it.to == current}}.size()
+//        }
+
+//        def gv = new GraphVizGenerator(graph: dependents)
+//        gv.generate()
+//        gv.reveal()
+
+//        def nextLevel = dependents.findAll{it.rank == toBeIntegrated.rank + 1}.findAll {it.outgoing.find {it.to == toBeIntegrated}.isStale()}
+//        //nextLevel.each {println it.name + " " + it.outgoing.find {it.to == toBeIntegrated}.isStale()+ "  "+ it.outgoing.find {it.to == toBeIntegrated}.dependency.version}
+//        //println toBeIntegrated.name+" current version is: "+toBeIntegrated.projectSource.version
+//        BuildRunner br = new BuildRunner(projectSources:  nextLevel.collect {it.projectSource})
+//        br.start(4)
+//        def results = br.completeBuildRecords
+//        results.findAll { it.result == BuildRecord.BuildResult.Failed }.each {
+//            println it.projectSource.name + " " + it.result
+//        }
+    }
+
 
     static buildAll(projects) {
         long start = System.currentTimeMillis()
