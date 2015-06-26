@@ -67,7 +67,7 @@ class CarfaxGradleProjectSource implements ProjectSource {
 
     @Override
     void incrementVersion() {
-
+       throw new RuntimeException("not implemented")
     }
 
     @Override
@@ -93,7 +93,7 @@ class CarfaxGradleProjectSource implements ProjectSource {
             File depsFile = new File(projectDirectory, "dependencies.properties")
 
             props.load(depsFile.newInputStream())
-            props.store(new File(projectDirectory, "old-dependencies.properties").newOutputStream(),"backup before dependency update")
+            props.store(new File(projectDirectory, "old-dependencies-${System.currentTimeMillis()}.properties").newOutputStream(),"backup before dependency update")
             props[dependency.projectSourceName] = newVersion.toString()
             props.store(new File(projectDirectory, "dependencies.properties").newOutputStream(), "updated with dependency updater")
         } else {

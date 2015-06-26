@@ -56,6 +56,9 @@ class GraphVizGenerator {
                     edgeStyle = "[color=blue,style=\"setlinewidth(8)\"]"
 
                 }
+                if (dependency.updateFailed) {
+                    edgeStyle =  "[color=purple,style=\"setlinewidth(4)\"]"
+                }
                 content += "   " + fix(node.projectSource.name) + " -> " + fix(dependency.to.name) + " "+edgeStyle+"; \n"
             }
         }

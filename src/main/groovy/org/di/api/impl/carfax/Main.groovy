@@ -16,7 +16,7 @@ public class Main {
     public static void main(String... args) {
         SourceRepository repository = new CarfaxLibSourceRepository(localDir: new File("D:/hackathon"));
 
-        blah(repository)
+        updateOneProject(repository, "dealerautoreports-commons")
     }
 
     static updateOne(String projectName, Collection<ProjectSource> projects) {
@@ -58,9 +58,10 @@ public class Main {
 
 
 
-    static blah(SourceRepository repository) {
+    static updateOneProject(SourceRepository repository, String projectName) {
+        repository.downloadAll()
         Graph g = new Graph(repository)
-        Graph dependents = new Graph(new SpanningTreeBuilder(world: g, treeRoot: "dealerautoreports-commons").connectedProjects)
+        Graph dependents = new Graph(new SpanningTreeBuilder(world: g, treeRoot: projectName).connectedProjects)
         dependents.initRank()
 
         BuildRunner br = new BuildRunner(projectSources: dependents.nodes.collect {it.projectSource} )
@@ -69,28 +70,26 @@ public class Main {
         results.findAll { it.result == BuildRecord.BuildResult.Failed }.each { currentBuild ->
             dependents.nodes.find {it.name == currentBuild.projectSource.name }.buildFailed = true
         }
+
+        def rank= 2
+        Collection<Node> levelProjects = dependents.nodes.findAll {it.rank == rank && !it.buildFailed}
+        Map<Node, BulkDependencyIncrementer> incrementers = new HashMap<>().withDefault {node -> new BulkDependencyIncrementer(node: node)}
+        levelProjects.each {incrementers[it].increment()}
+        BuildRunner br2 = new BuildRunner(projectSources: levelProjects.collect {it.projectSource} )
+        br2.start(4)
+        def results2 = br2.completeBuildRecords
+        results2.findAll { it.result == BuildRecord.BuildResult.Failed }.each { currentBuild ->
+            Node failed = levelProjects.find {it.name == currentBuild.projectSource.name }
+            failed.outgoing.each {it.updateFailed = true}
+            incrementers[failed].rollback()
+        }
+
+       // dependents.nodes.find {it.name == 'dealerautoreports-commons-acceptance'}.buildFailed = true
+
         def gv = new GraphVizGenerator(graph: dependents)
         gv.generate()
         gv.reveal()
 
-
-//        buildLevelsGraph.nodes.findAll {it.rank == 7}.each { Node current ->
-//            println current.name +"  "+ current.outgoing.size() + "  "+buildLevelsGraph.nodes.findAll {it.outgoing.find {it.to == current}}.size()
-//        }
-
-//        def gv = new GraphVizGenerator(graph: dependents)
-//        gv.generate()
-//        gv.reveal()
-
-//        def nextLevel = dependents.findAll{it.rank == toBeIntegrated.rank + 1}.findAll {it.outgoing.find {it.to == toBeIntegrated}.isStale()}
-//        //nextLevel.each {println it.name + " " + it.outgoing.find {it.to == toBeIntegrated}.isStale()+ "  "+ it.outgoing.find {it.to == toBeIntegrated}.dependency.version}
-//        //println toBeIntegrated.name+" current version is: "+toBeIntegrated.projectSource.version
-//        BuildRunner br = new BuildRunner(projectSources:  nextLevel.collect {it.projectSource})
-//        br.start(4)
-//        def results = br.completeBuildRecords
-//        results.findAll { it.result == BuildRecord.BuildResult.Failed }.each {
-//            println it.projectSource.name + " " + it.result
-//        }
     }
 
 
