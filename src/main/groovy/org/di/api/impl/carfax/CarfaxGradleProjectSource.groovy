@@ -96,6 +96,7 @@ class CarfaxGradleProjectSource implements ProjectSource {
             props.store(new File(projectDirectory, "old-dependencies-${System.currentTimeMillis()}.properties").newOutputStream(),"backup before dependency update")
             props[dependency.projectSourceName] = newVersion.toString()
             props.store(new File(projectDirectory, "dependencies.properties").newOutputStream(), "updated with dependency updater")
+            dependencies = null    //todo: TEST me!
         } else {
             log.warning "I don't know yet how to update build.gradle dependencies in ${name}: "+dependency.projectSourceName
         }

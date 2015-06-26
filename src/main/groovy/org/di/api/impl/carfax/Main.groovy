@@ -16,7 +16,8 @@ public class Main {
     public static void main(String... args) {
         SourceRepository repository = new CarfaxLibSourceRepository(localDir: new File("D:/hackathon"));
 
-        updateOneProject(repository, "dealerautoreports-commons")
+       // updateOneProject(repository, "dealerautoreports-commons")
+        demo(repository)
     }
 
     static updateOne(String projectName, Collection<ProjectSource> projects) {
@@ -56,37 +57,87 @@ public class Main {
         }
     }
 
+    static demo(SourceRepository repository) {
+        String projectName = "dealer-inventory-domain"
+        //repository.downloadAll()
+        Graph g = new Graph(repository)
+        Graph dependents = new Graph(new SpanningTreeBuilder(world: g, treeRoot: projectName).connectedProjects)
+        dependents.initRank()
+        def gv = new GraphVizGenerator(graph: dependents)
+//        gv.graph.nodes.each {
+//            println it.name + " " + it.rank
+//        }
+//        BuildRunner br = new BuildRunner(projectSources: dependents.nodes.collect {it.projectSource} )
+//        br.start(4)
+//        def results = br.completeBuildRecords
+//        results.findAll { it.result == BuildRecord.BuildResult.Failed }.each { currentBuild ->
+//            dependents.nodes.find {it.name == currentBuild.projectSource.name }.buildFailed = true
+//        }
+     //   dependents.nodes.find {it.name == 'dealerautoreports-commons-acceptance'}.buildFailed = true
 
+        gv.generate()
+        gv.reveal()
+        println "number of jars dependent on ${projectName}: "+(dependents.nodes.size() - 1)
+
+//        def rank= 2
+//        Map<Node, BulkDependencyIncrementer> incrementers = new HashMap<>().withDefault {node -> new BulkDependencyIncrementer(node: node)}
+//        Collection<Node> levelProjects = dependents.nodes.findAll {it.rank == rank && !it.buildFailed && incrementers[it].increment()}
+//        println "now will try to integrate rank ${rank}: "+ levelProjects
+//
+//        //levelProjects. {incrementers[it].increment()}
+//        BuildRunner br2 = new BuildRunner(projectSources: levelProjects.collect {it.projectSource} )
+//        br2.start(4)
+//        def results2 = br2.completeBuildRecords
+//        results2.findAll { it.result == BuildRecord.BuildResult.Failed }.each { currentBuild ->
+//            Node failed = levelProjects.find {it.name == currentBuild.projectSource.name }
+//            failed.outgoing.each {it.updateFailed = true}
+//            failed.buildFailed = true
+//            incrementers[failed].rollback()
+//        }
+//
+//
+//        gv.generate()
+//        gv.reveal()
+
+    }
 
     static updateOneProject(SourceRepository repository, String projectName) {
         repository.downloadAll()
         Graph g = new Graph(repository)
         Graph dependents = new Graph(new SpanningTreeBuilder(world: g, treeRoot: projectName).connectedProjects)
         dependents.initRank()
-
-        BuildRunner br = new BuildRunner(projectSources: dependents.nodes.collect {it.projectSource} )
-        br.start(4)
-        def results = br.completeBuildRecords
-        results.findAll { it.result == BuildRecord.BuildResult.Failed }.each { currentBuild ->
-            dependents.nodes.find {it.name == currentBuild.projectSource.name }.buildFailed = true
+        def gv = new GraphVizGenerator(graph: dependents)
+        gv.graph.nodes.each {
+            println it.name + " " + it.rank
         }
+//        BuildRunner br = new BuildRunner(projectSources: dependents.nodes.collect {it.projectSource} )
+//        br.start(4)
+//        def results = br.completeBuildRecords
+//        results.findAll { it.result == BuildRecord.BuildResult.Failed }.each { currentBuild ->
+//            dependents.nodes.find {it.name == currentBuild.projectSource.name }.buildFailed = true
+//        }
+dependents.nodes.find {it.name == 'dealerautoreports-commons-acceptance'}.buildFailed = true
+
+        gv.generate()
+        gv.reveal()
 
         def rank= 2
-        Collection<Node> levelProjects = dependents.nodes.findAll {it.rank == rank && !it.buildFailed}
         Map<Node, BulkDependencyIncrementer> incrementers = new HashMap<>().withDefault {node -> new BulkDependencyIncrementer(node: node)}
-        levelProjects.each {incrementers[it].increment()}
+        Collection<Node> levelProjects = dependents.nodes.findAll {it.rank == rank && !it.buildFailed && incrementers[it].increment()}
+        println "now will try to integrate rank ${rank}: "+ levelProjects
+
+        //levelProjects. {incrementers[it].increment()}
         BuildRunner br2 = new BuildRunner(projectSources: levelProjects.collect {it.projectSource} )
         br2.start(4)
         def results2 = br2.completeBuildRecords
         results2.findAll { it.result == BuildRecord.BuildResult.Failed }.each { currentBuild ->
             Node failed = levelProjects.find {it.name == currentBuild.projectSource.name }
             failed.outgoing.each {it.updateFailed = true}
+              failed.buildFailed = true
             incrementers[failed].rollback()
         }
 
-       // dependents.nodes.find {it.name == 'dealerautoreports-commons-acceptance'}.buildFailed = true
 
-        def gv = new GraphVizGenerator(graph: dependents)
         gv.generate()
         gv.reveal()
 
