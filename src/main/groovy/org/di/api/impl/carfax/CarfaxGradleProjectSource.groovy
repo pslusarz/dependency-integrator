@@ -43,7 +43,7 @@ class CarfaxGradleProjectSource implements ProjectSource {
     @Override
     Version getVersion() {
         if (!version) {
-            String cmd = "cmd /c git --git-dir=${projectDirectory.absolutePath}\\.git --no-pager --work-tree=${projectDirectory.absolutePath} log master -5 --tags --grep=release --pretty=oneline"
+            String cmd = "${System.properties["os.name"]?.startsWith("Windows")? 'cmd /c ':''}git --git-dir=${projectDirectory.absolutePath}\\.git --no-pager --work-tree=${projectDirectory.absolutePath} log master -5 --tags --grep=release --pretty=oneline"
             def proc = cmd.execute()
             proc.waitFor()
             List<String> versions = (proc.text).trim().split("\n")
