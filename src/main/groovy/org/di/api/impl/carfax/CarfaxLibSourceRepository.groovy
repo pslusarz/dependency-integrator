@@ -37,7 +37,10 @@ class CarfaxLibSourceRepository implements SourceRepository {
         localDir.mkdirs()
         projectNames.collect() { String projectName ->
 
-            String cmd ="cmd /c git clone ssh://git@stash:7999/lib/${projectName}.git ${localDir.absolutePath.replaceAll("\\\\", "/")+'/'+projectName}"
+            String cmd ="git clone ssh://git@stash:7999/lib/${projectName}.git ${localDir.absolutePath.replaceAll("\\\\", "/")+'/'+projectName}"
+            if (System.properties["os.name"]?.startsWith("Windows")) {
+                cmd = "cmd /c "+cmd
+            }
             println cmd
             cmd.execute()
         }.each {it.waitFor()}

@@ -14,10 +14,10 @@ import org.di.graph.visualization.GraphVizGenerator
 
 public class Main {
     public static void main(String... args) {
-        SourceRepository repository = new CarfaxLibSourceRepository(localDir: new File("D:/hackathon"));
-
+        SourceRepository repository = new CarfaxLibSourceRepository(localDir: new File("work/project-sources/"));
+        //repository.downloadAll()
        // updateOneProject(repository, "dealerautoreports-commons")
-        demo(repository)
+       // demo(repository)
     }
 
     static updateOne(String projectName, Collection<ProjectSource> projects) {
