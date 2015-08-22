@@ -7,6 +7,7 @@ import org.di.api.SourceRepository
 class Graph {
     List<Node> nodes = []
     List<List<Node>> cycles
+    boolean rankInit = false
 
     Graph() {}
 
@@ -72,6 +73,9 @@ class Graph {
     }
 
     def initRank() {
+        if (rankInit) {
+            return
+        }
         if (!cycles) {
             initCycles()
         }

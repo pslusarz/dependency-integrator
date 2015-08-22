@@ -13,6 +13,7 @@ class GraphVizGenerator {
     String dotCommandLocation
     String commandExecutionPrefix
     String commandOpenPrefix
+    String shape = "point"
 
     GraphVizGenerator() {
         script = new File(System.getProperty("java.io.tmpdir")+"/di.dot")
@@ -31,7 +32,8 @@ class GraphVizGenerator {
     }
 
     def generate() {
-        String content = "digraph G { ranksep=3; nodesep=0.1; node [shape=point,width=.75,height=.5,fontsize=5];\n"
+        graph.initRank()
+        String content = "digraph G { ranksep=1; nodesep=0.1; node [shape=${shape},width=.95,height=.95];\n"
         def levels = graph.nodes.groupBy {it.rank}.keySet().sort{-it}
         content += "  {  node [shape=none]; edge [style=invis]; \n"
         content += "    "+levels.join(" -> ")
