@@ -17,7 +17,7 @@ class BulkDependencyIncrementer {
         node.outgoing.each { Edge edge ->
             if (edge.isStale()) {
                 originalVersions[edge.dependency] = edge.dependency.version
-                node.projectSource.setDependencyVersion(edge.dependency, edge.to.projectSource.version)
+                node.projectSource.setDependencyVersion(edge.dependency, edge.to.projectSource.latestVersion)
                 edge.dependency = node.projectSource.dependencies.find {it.projectSourceName == edge.dependency.projectSourceName} //todo - test
                 result = true    //todo: test me!
 

@@ -52,7 +52,7 @@ class GraphVizGenerator {
                 String edgeStyle = ""
                 if (dependency.isStale() ) {
                     edgeStyle =  "[color=red,style=\"setlinewidth(4)\"]"
-                    println node.projectSource.name + " depends on "+dependency.to.name + " version "+dependency.dependency.version.toString()+ " ("+dependency.to.projectSource.version.toString()+")"
+                    println node.projectSource.name + " depends on "+dependency.to.name + " version "+dependency.dependency.version.toString()+ " ("+dependency.to.projectSource.latestVersion.toString()+")"
                 }
                 if (dependency.cyclic) {
                     edgeStyle = "[color=blue,style=\"setlinewidth(8)\"]"

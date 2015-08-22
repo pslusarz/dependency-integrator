@@ -1,7 +1,9 @@
-package org.di.api.impl.carfax;
+package org.di.api.impl.carfax
 
+import groovy.util.logging.Log;
 import org.di.api.Version;
 
+@Log
 public class StringMajorMinorPatchVersion implements Version {
     private final String value;
     long major = -1
@@ -82,5 +84,18 @@ public class StringMajorMinorPatchVersion implements Version {
     @Override
     String toString() {
         return value
+    }
+
+    static List<Version> parseFromGitLog(String gitLog) {
+        List<Version> result = []
+        gitLog.split("\n").reverse().findAll{it.contains " Tagging "}.each { String line ->
+            def version = new StringMajorMinorPatchVersion(line.split(" ")[-3]- "-SNAPSHOT")
+            if (!result.contains(version)) {
+                result << version
+            } else {
+                log.warning "  duplicate version in git log: "+line
+            }
+        }
+        return result
     }
 }

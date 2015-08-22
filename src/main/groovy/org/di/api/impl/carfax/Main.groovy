@@ -15,43 +15,84 @@ import org.di.graph.visualization.GraphVizGenerator
 public class Main {
     public static void main(String... args) {
         SourceRepository repository = new CarfaxLibSourceRepository(localDir: new File("work/project-sources/"));
+        displayVersions(repository)
+        //drawGraphWithFailed(repository)
         //repository.downloadAll()
-       // updateOneProject(repository, "dealerautoreports-commons")
-       // demo(repository)
+        // updateOneProject(repository, "dealerautoreports-commons")
+        // demo(repository)
     }
 
     static updateOne(String projectName, Collection<ProjectSource> projects) {
-        BulkDependencyIncrementer b = new BulkDependencyIncrementer(projectSource: projects.find {it.name == projectName}, projectSources:  projects)
+        BulkDependencyIncrementer b = new BulkDependencyIncrementer(projectSource: projects.find {
+            it.name == projectName
+        }, projectSources: projects)
         b.increment()
     }
+
+    static displayVersions(SourceRepository repository) {
+        List<ProjectSource> projectSources = repository.init()
+        projectSources.sort {-it.versions.size()}.each {
+            println it.name + "  "+it.versions.size()
+        }
+    }
+
+//    static drawGraphWithFailed(SourceRepository repository) {
+//        def failedNames = ['carfax-auction-bridge', 'carfax-commons-controlm', 'carfax-core-consumer', 'carfax-cvs-navigator', 'carfax-logging-commons',
+//                           'carfax-product-commons', 'carfax-xinfo', 'carfaxonline-java-acceptance', 'coffeescript-extensions',
+//                           'consumer-fitnesse', 'consumer-testing-internal', 'cvs-repository-plugin', 'datasource-provider-domain',
+//                           'dealerautoreports-commons-acceptance', 'git-repository-plugin', 'jsspec-runner',
+//                           'messaging-adapters', 'name-in-lights-acceptance', 'quickvin-domain', 'rest-client-extensions',
+//                           'subscriber-domain', 'VzMetadata', 'webdriver-fitnesse-extensions']
+//        Graph graph = new Graph(repository)
+//        graph.initRank()
+//        failedNames.each { String failed ->
+//
+//            Node n = graph.nodes.find { it.name == failed }
+//            if (n) {
+//                n.buildFailed = true
+//            } else {
+//                println "could not find node for: " + failed
+//            }
+//        }
+//        def gv = new GraphVizGenerator(graph: graph)
+//        gv.generate()
+//        gv.reveal()
+//
+//    }
 
     static updateLevel(SourceRepository repository, int rank) {
         Map<ProjectSource, BulkDependencyIncrementer> updates = [:]
         Graph g = new Graph(repository)
         g.initRank()
-        g.nodes.findAll {it.rank == rank && it.outgoing.find{it.isStale()}}.each { Node node ->
-           println node.projectSource.name
-           node.outgoing.findAll {it.stale}.each { Edge edge ->
-               println "   "+edge.dependency.projectSourceName + "  "+edge.dependency.version+" ("+edge.to.projectSource.version+")"
+        g.nodes.findAll { it.rank == rank && it.outgoing.find { it.isStale() } }.each { Node node ->
+            println node.projectSource.name
+            node.outgoing.findAll { it.stale }.each { Edge edge ->
+                println "   " + edge.dependency.projectSourceName + "  " + edge.dependency.version + " (" + edge.to.projectSource.latestVersion + ")"
 
-           }
-           def update = new BulkDependencyIncrementer(node: node)
-           updates[node.projectSource] = update
+            }
+            def update = new BulkDependencyIncrementer(node: node)
+            updates[node.projectSource] = update
         }
         BuildRunner br = new BuildRunner(projectSources: updates.keySet())
         br.start(4)
         List<BuildRecord> results = br.completeBuildRecords
-        def failedBeforeUpdate = results.findAll {it.result == BuildRecord.BuildResult.Failed}.collect {it.projectSource}
-        println "Failed before upgrade: "+failedBeforeUpdate
-        Map<ProjectSource, BulkDependencyIncrementer> candidates = updates.findAll {!failedBeforeUpdate.contains(it.key)}
+        def failedBeforeUpdate = results.findAll { it.result == BuildRecord.BuildResult.Failed }.collect {
+            it.projectSource
+        }
+        println "Failed before upgrade: " + failedBeforeUpdate
+        Map<ProjectSource, BulkDependencyIncrementer> candidates = updates.findAll {
+            !failedBeforeUpdate.contains(it.key)
+        }
         candidates.each {
-           it.value.increment()
+            it.value.increment()
         }
         BuildRunner br2 = new BuildRunner(projectSources: candidates.keySet())
         br2.start(4)
         List<BuildRecord> resultsAfterUpgrade = br2.completeBuildRecords
-        def failedAfterUpdate = resultsAfterUpgrade.findAll {it.result == BuildRecord.BuildResult.Failed}.collect {it.projectSource}
-        println "Failed after update: "+failedAfterUpdate
+        def failedAfterUpdate = resultsAfterUpgrade.findAll { it.result == BuildRecord.BuildResult.Failed }.collect {
+            it.projectSource
+        }
+        println "Failed after update: " + failedAfterUpdate
         failedAfterUpdate.each {
             updates[it].rollback()
         }
@@ -73,11 +114,11 @@ public class Main {
 //        results.findAll { it.result == BuildRecord.BuildResult.Failed }.each { currentBuild ->
 //            dependents.nodes.find {it.name == currentBuild.projectSource.name }.buildFailed = true
 //        }
-     //   dependents.nodes.find {it.name == 'dealerautoreports-commons-acceptance'}.buildFailed = true
+        //   dependents.nodes.find {it.name == 'dealerautoreports-commons-acceptance'}.buildFailed = true
 
         gv.generate()
         gv.reveal()
-        println "number of jars dependent on ${projectName}: "+(dependents.nodes.size() - 1)
+        println "number of jars dependent on ${projectName}: " + (dependents.nodes.size() - 1)
 
 //        def rank= 2
 //        Map<Node, BulkDependencyIncrementer> incrementers = new HashMap<>().withDefault {node -> new BulkDependencyIncrementer(node: node)}
@@ -116,24 +157,26 @@ public class Main {
 //        results.findAll { it.result == BuildRecord.BuildResult.Failed }.each { currentBuild ->
 //            dependents.nodes.find {it.name == currentBuild.projectSource.name }.buildFailed = true
 //        }
-dependents.nodes.find {it.name == 'dealerautoreports-commons-acceptance'}.buildFailed = true
+        dependents.nodes.find { it.name == 'dealerautoreports-commons-acceptance' }.buildFailed = true
 
         gv.generate()
         gv.reveal()
 
-        def rank= 2
-        Map<Node, BulkDependencyIncrementer> incrementers = new HashMap<>().withDefault {node -> new BulkDependencyIncrementer(node: node)}
-        Collection<Node> levelProjects = dependents.nodes.findAll {it.rank == rank && !it.buildFailed && incrementers[it].increment()}
-        println "now will try to integrate rank ${rank}: "+ levelProjects
+        def rank = 2
+        Map<Node, BulkDependencyIncrementer> incrementers = new HashMap<>().withDefault { node -> new BulkDependencyIncrementer(node: node) }
+        Collection<Node> levelProjects = dependents.nodes.findAll {
+            it.rank == rank && !it.buildFailed && incrementers[it].increment()
+        }
+        println "now will try to integrate rank ${rank}: " + levelProjects
 
         //levelProjects. {incrementers[it].increment()}
-        BuildRunner br2 = new BuildRunner(projectSources: levelProjects.collect {it.projectSource} )
+        BuildRunner br2 = new BuildRunner(projectSources: levelProjects.collect { it.projectSource })
         br2.start(4)
         def results2 = br2.completeBuildRecords
         results2.findAll { it.result == BuildRecord.BuildResult.Failed }.each { currentBuild ->
-            Node failed = levelProjects.find {it.name == currentBuild.projectSource.name }
-            failed.outgoing.each {it.updateFailed = true}
-              failed.buildFailed = true
+            Node failed = levelProjects.find { it.name == currentBuild.projectSource.name }
+            failed.outgoing.each { it.updateFailed = true }
+            failed.buildFailed = true
             incrementers[failed].rollback()
         }
 

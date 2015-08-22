@@ -40,7 +40,7 @@ class SourceRepositoryForTestingTest {
 
         def dependency = projects.find {it.name == "project1"}.dependencies.find {it.projectSourceName == "project2"}
         assert dependency
-        assert dependency.version.before(projects.find {it.name == "project2"}.version)
+        assert dependency.version.before(projects.find {it.name == "project2"}.latestVersion)
     }
 
     @Test
@@ -61,5 +61,6 @@ class SourceRepositoryForTestingTest {
 
 
     }
+
 
 }

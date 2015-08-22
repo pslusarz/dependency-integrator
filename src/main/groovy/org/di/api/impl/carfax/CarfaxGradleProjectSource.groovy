@@ -8,7 +8,7 @@ import org.di.api.Version
 @Log
 class CarfaxGradleProjectSource implements ProjectSource {
     private final File projectDirectory;
-    private Version version
+    private List<Version> versions = []
 
     public CarfaxGradleProjectSource(File projectDirectory) {
         this.projectDirectory = projectDirectory
@@ -40,25 +40,34 @@ class CarfaxGradleProjectSource implements ProjectSource {
         return new File(projectDirectory, "dependencies.properties").exists()
     }
 
-    @Override
-    Version getVersion() {
-        if (!version) {
-            String cmd = "${System.properties["os.name"]?.startsWith("Windows")? 'cmd /c ':''}git --git-dir=${projectDirectory.absolutePath}/.git --no-pager --work-tree=${projectDirectory.absolutePath} log master -5 --tags --grep=release --pretty=oneline"
+    private initVersions() {
+        if (versions.size() == 0) {
+            String cmd = "${System.properties["os.name"]?.startsWith("Windows")? 'cmd /c ':''}git --git-dir=${projectDirectory.absolutePath}/.git --no-pager --work-tree=${projectDirectory.absolutePath} log --tags --grep=release --pretty=oneline"
             def proc = cmd.execute()
             proc.waitFor()
-            List<String> versions = (proc.text).trim().split("\n")
-            List<String> gitLogLineChunks = versions.first().split(" ")
-            if (gitLogLineChunks.size() > 2) {
-                version = new StringMajorMinorPatchVersion(gitLogLineChunks[-3] - "-SNAPSHOT")
-            } else {
-
+            String output = proc.text
+            versions = StringMajorMinorPatchVersion.parseFromGitLog(output)
+            if (versions.size() == 0) {
                 log.warning "NO TAG FOR ${name}, trying version from properties"
                 log.warning "  command used: "+cmd
-                log.warning "  output: "+versions
-                version = getVersionFromProperties()
+                log.warning "  output: "+output
+                versions = [getVersionFromProperties()]
             }
         }
-        return version
+    }
+
+    @Override
+    public List<Version> getVersions() {
+        initVersions()
+        def result = []
+        result.addAll(versions)
+        return result
+    }
+
+    @Override
+    Version getLatestVersion() {
+        initVersions()
+        return versions.last()
     }
 
     Version getVersionFromProperties() {

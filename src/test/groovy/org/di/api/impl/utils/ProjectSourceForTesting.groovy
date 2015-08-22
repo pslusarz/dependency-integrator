@@ -30,8 +30,13 @@ class ProjectSourceForTesting implements ProjectSource {
     }
 
     @Override
-    Version getVersion() {
+    Version getLatestVersion() {
         return new VersionForTesting(value: version)
+    }
+
+    @Override
+    public List<Version> getVersions() {
+        return [getLatestVersion()]
     }
 
     @Override

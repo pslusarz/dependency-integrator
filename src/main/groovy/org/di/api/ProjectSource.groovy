@@ -18,7 +18,13 @@ interface ProjectSource {
      * Use incrementVersion to make a permanent change.
      * @return
      */
-    public Version getVersion()
+    public Version getLatestVersion()
+
+    /**
+     * Ordered chronologically, ie. oldest (smallest number) first
+     * @return
+     */
+    public List<Version> getVersions()
 
     /**
      * permanently change project version in preparation to publish a new artifact

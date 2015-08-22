@@ -1,7 +1,6 @@
 package org.di.graph
 
 import org.di.api.Dependency
-import org.di.api.Version
 
 class Edge {
     Node to, from
@@ -9,6 +8,6 @@ class Edge {
     boolean updateFailed = false
     boolean cyclic = false
     boolean isStale() {
-        dependency.version.toString() != to.projectSource.version.toString()
+        dependency.version.toString() != to.projectSource.latestVersion.toString()
     }
 }
