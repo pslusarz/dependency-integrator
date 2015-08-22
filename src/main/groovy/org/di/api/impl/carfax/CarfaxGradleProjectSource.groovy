@@ -43,7 +43,7 @@ class CarfaxGradleProjectSource implements ProjectSource {
     @Override
     Version getVersion() {
         if (!version) {
-            String cmd = "${System.properties["os.name"]?.startsWith("Windows")? 'cmd /c ':''}git --git-dir=${projectDirectory.absolutePath}\\.git --no-pager --work-tree=${projectDirectory.absolutePath} log master -5 --tags --grep=release --pretty=oneline"
+            String cmd = "${System.properties["os.name"]?.startsWith("Windows")? 'cmd /c ':''}git --git-dir=${projectDirectory.absolutePath}/.git --no-pager --work-tree=${projectDirectory.absolutePath} log master -5 --tags --grep=release --pretty=oneline"
             def proc = cmd.execute()
             proc.waitFor()
             List<String> versions = (proc.text).trim().split("\n")
@@ -51,7 +51,10 @@ class CarfaxGradleProjectSource implements ProjectSource {
             if (gitLogLineChunks.size() > 2) {
                 version = new StringMajorMinorPatchVersion(gitLogLineChunks[-3] - "-SNAPSHOT")
             } else {
+
                 log.warning "NO TAG FOR ${name}, trying version from properties"
+                log.warning "  command used: "+cmd
+                log.warning "  output: "+versions
                 version = getVersionFromProperties()
             }
         }
