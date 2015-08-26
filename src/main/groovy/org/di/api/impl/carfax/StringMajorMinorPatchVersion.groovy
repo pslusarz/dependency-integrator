@@ -86,16 +86,4 @@ public class StringMajorMinorPatchVersion implements Version {
         return value
     }
 
-    static List<Version> parseFromGitLog(String gitLog) {
-        List<Version> result = []
-        gitLog.split("\n").reverse().findAll{it.contains " Tagging "}.each { String line ->
-            def version = new StringMajorMinorPatchVersion(line.split(" ")[-3]- "-SNAPSHOT")
-            if (!result.contains(version)) {
-                result << version
-            } else {
-                log.warning "  duplicate version in git log: "+line
-            }
-        }
-        return result
-    }
 }

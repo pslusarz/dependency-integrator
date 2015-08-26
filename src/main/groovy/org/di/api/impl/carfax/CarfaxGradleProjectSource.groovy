@@ -6,11 +6,13 @@ import org.di.api.ProjectSource
 import org.di.api.Version
 import org.di.api.impl.carfax.util.Command
 import org.di.api.impl.carfax.util.Git
+import org.di.api.impl.carfax.util.GitVersionTag
 
 @Log
 class CarfaxGradleProjectSource implements ProjectSource {
     private final File projectDirectory;
     private List<Version> versions = []
+
 
     public CarfaxGradleProjectSource(File projectDirectory) {
         this.projectDirectory = projectDirectory
@@ -46,7 +48,7 @@ class CarfaxGradleProjectSource implements ProjectSource {
         if (versions.size() == 0) {
 
             String output = Git.getVersionTags(projectDirectory)
-            versions = StringMajorMinorPatchVersion.parseFromGitLog(output)
+            versions = GitVersionTag.parseFromGitLog(output).collect {it.version}
             if (versions.size() == 0) {
                 log.warning "NO TAG FOR ${name}, trying version from properties"
                 log.warning "  git output: "+output
