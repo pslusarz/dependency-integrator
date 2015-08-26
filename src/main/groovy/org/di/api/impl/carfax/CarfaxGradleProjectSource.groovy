@@ -49,8 +49,7 @@ class CarfaxGradleProjectSource implements ProjectSource {
             versions = StringMajorMinorPatchVersion.parseFromGitLog(output)
             if (versions.size() == 0) {
                 log.warning "NO TAG FOR ${name}, trying version from properties"
-                log.warning "  command used: "+cmd
-                log.warning "  output: "+output
+                log.warning "  git output: "+output
                 versions = [getVersionFromProperties()]
             }
         }
