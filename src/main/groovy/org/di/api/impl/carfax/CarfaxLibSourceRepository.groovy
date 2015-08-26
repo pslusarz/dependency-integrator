@@ -2,11 +2,36 @@ package org.di.api.impl.carfax
 
 import org.di.api.ProjectSource
 import org.di.api.SourceRepository
+import org.di.api.impl.carfax.util.Git
+import org.di.api.impl.carfax.util.GitVersionTag
 
 
 class CarfaxLibSourceRepository implements SourceRepository {
     File localDir
 
+
+    Map<CarfaxGradleProjectSource, List<ImmutableProjectSource>> getPastProjectSources(Collection<CarfaxGradleProjectSource> projectSources) {
+        def result = [:]
+        projectSources.each { CarfaxGradleProjectSource projectSource ->
+            List<GitVersionTag> gitVersions = GitVersionTag.parseFromGitLog(Git.getVersionTags(projectSource.projectDirectory))
+            List<ImmutableProjectSource> pastProjects = []
+            try {
+                gitVersions.each { GitVersionTag tag ->
+                    Git.checkout(projectSource.projectDirectory, tag.commitSha)
+                    ImmutableProjectSource immutableProjectSource = new ImmutableProjectSource(version: tag.version, projectDirectory: projectSource.projectDirectory)
+                    immutableProjectSource.dependencies //initialize
+                    pastProjects << immutableProjectSource
+
+                }
+            } finally {
+                Git.checkout(projectSource.projectDirectory, "master")
+            }
+            result[projectSource] = pastProjects
+        }
+
+        return result
+
+    }
 
     @Override
     Collection<ProjectSource> init() {

@@ -15,7 +15,8 @@ import org.di.graph.visualization.GraphVizGenerator
 public class Main {
     public static void main(String... args) {
         SourceRepository repository = new CarfaxLibSourceRepository(localDir: new File("work/project-sources/"));
-        displayVersions(repository)
+        playWithPastProjectVersions(repository)
+        //displayVersions(repository)
         //drawGraphWithFailed(repository)
         //repository.downloadAll()
         // updateOneProject(repository, "dealerautoreports-commons")
@@ -27,6 +28,19 @@ public class Main {
             it.name == projectName
         }, projectSources: projects)
         b.increment()
+    }
+
+    static playWithPastProjectVersions(CarfaxLibSourceRepository repository) {
+        def gaga = repository.getPastProjectSources(repository.init())
+        gaga.each {project, pastProjects ->
+            println project
+            pastProjects.each { pastProject ->
+                println "  "+pastProject.version
+                pastProject.dependencies.each { dependency ->
+                   println "    "+dependency.projectSourceName + " "+dependency.version
+                }
+            }
+        }
     }
 
     static displayVersions(SourceRepository repository) {
