@@ -9,8 +9,7 @@ import org.di.api.impl.carfax.util.Git
 import org.di.api.impl.carfax.util.GitVersionTag
 
 @Log
-class CarfaxGradleProjectSource implements ProjectSource {
-    private final File projectDirectory;
+class CarfaxGradleProjectSource extends ImmutableProjectSource implements ProjectSource {
     private List<Version> versions = []
 
 
@@ -28,21 +27,6 @@ class CarfaxGradleProjectSource implements ProjectSource {
         return projectDirectory.name
     }
 
-    boolean hasBuildFile() {
-        new File(projectDirectory, "build.gradle").exists()
-    }
-
-    boolean hasCarfaxDependencyInBuildFile() {
-        if (hasBuildFile()) {
-            String text = new File(projectDirectory, "build.gradle").text
-            return text.contains('carfax:') || text.contains("""group: 'carfax'""") || text.contains("""group: "carfax\"""")
-        }
-        return false
-    }
-
-    boolean hasManagedDependenciesFile() {
-        return new File(projectDirectory, "dependencies.properties").exists()
-    }
 
     private initVersions() {
         if (versions.size() == 0) {
@@ -112,42 +96,6 @@ class CarfaxGradleProjectSource implements ProjectSource {
             dependencies = null    //todo: TEST me!
         } else {
             log.warning "I don't know yet how to update build.gradle dependencies in ${name}: "+dependency.projectSourceName
-        }
-    }
-
-    def parseFromBuildGradle() {
-        def result = []
-        def lines = new File(projectDirectory, "build.gradle").readLines()
-        lines.findAll { it.contains('carfax:') }.each { line -> // compile 'carfax:serialization-extensions:3.1.1'
-            String depChunk = line.split(/['|"]/)[1] //carfax:serialization-extensions:3.1.1
-            String[] depChunk2 = depChunk.split(':')
-            def dep = new CarfaxJarDependency(depChunk2[1], new StringMajorMinorPatchVersion(depChunk2[2]), CarfaxJarDependency.DependencySource.buildfile)
-            result << dep
-
-        }
-
-        return result
-
-    }
-
-    def dependencies
-
-    def parseFromDependenciesProperties() {
-        try {
-            File dependencyPropertyFile = new File(projectDirectory, "dependencies.properties")
-            List<Dependency> dependencies = [];
-            dependencyPropertyFile.eachLine { String line ->
-                if (line) {
-                    String[] parts = line.split("=");
-                    if (parts.length == 2) {
-                        def dep = new CarfaxJarDependency(parts[0], new StringMajorMinorPatchVersion(parts[1]), CarfaxJarDependency.DependencySource.properties)
-                        dependencies.add(dep);
-                    }
-                }
-            }
-            return dependencies;
-        } catch (IOException e) {
-            return []
         }
     }
 
