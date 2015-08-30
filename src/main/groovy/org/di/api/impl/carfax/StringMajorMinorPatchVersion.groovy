@@ -86,4 +86,13 @@ public class StringMajorMinorPatchVersion implements Version {
         return value
     }
 
+    static Comparator<StringMajorMinorPatchVersion> comparator() {
+        new Comparator<String>() {
+            @Override
+            int compare(String o1, String o2) {
+                return new StringMajorMinorPatchVersion(o1).asLong() <=> new StringMajorMinorPatchVersion(o2).asLong()
+            }
+        }
+    }
+
 }
