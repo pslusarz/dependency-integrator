@@ -73,13 +73,14 @@ class PastProjectSources {
      */
 
     Map referencedVersionCounts() {
-        Map referencedVersionCounts = [:]
+        Map referencedVersionCounts = new TreeMap<String, Map<String, Integer>> ().withDefault {
+            new TreeMap<String, Integer>(StringMajorMinorPatchVersion.comparator()).withDefault {new Integer(0)}}
         referencedVersions().each { projectName, projectReferences ->
             def versionCounts = projectReferences.collectEntries { version, versionReferences ->
                 def count = versionReferences.collect { it.value }.sum { it.size() }
                 [version, count]
             }
-            referencedVersionCounts[projectName] = versionCounts.sort { a, b -> new StringMajorMinorPatchVersion(a.key).before(new StringMajorMinorPatchVersion(b.key)) ? 0 : 1 }
+            referencedVersionCounts[projectName] << versionCounts
         }
         return referencedVersionCounts
 

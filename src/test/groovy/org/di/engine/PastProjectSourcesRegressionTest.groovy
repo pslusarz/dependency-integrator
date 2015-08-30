@@ -45,4 +45,11 @@ class PastProjectSourcesRegressionTest {
         assert actual['serialization-extensions']['3.1.1'].size() == 7
         assert actual['serialization-extensions']['3.1.1']['consumer-account-domain'].collect {it.toString()} == ['2.0.19', '2.0.21', '2.0.22', '2.0.23', '2.0.24', '2.0.25', '2.0.26', '2.0.27', '2.0.28']
     }
+
+    @Test
+    void referencedVersionCountsDefaults() {
+        def actual = pastProjectSources.referencedVersionCounts()
+        assert actual['nonexistant-project'] != null
+        assert actual['nonexistant-project2']['1.0.99'] == 0
+    }
 }

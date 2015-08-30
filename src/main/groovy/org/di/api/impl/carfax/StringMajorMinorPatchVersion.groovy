@@ -86,7 +86,7 @@ public class StringMajorMinorPatchVersion implements Version {
         return value
     }
 
-    static Comparator<StringMajorMinorPatchVersion> comparator() {
+    static Comparator<String> comparator() {
         new Comparator<String>() {
             @Override
             int compare(String o1, String o2) {

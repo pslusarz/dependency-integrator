@@ -1,6 +1,8 @@
 package org.di.api.impl.carfax.util
 
+import groovy.util.logging.Log
 
+@Log
 class Command {
     static String commandExecutionPrefix
     static {
@@ -14,9 +16,12 @@ class Command {
     static String run(String command) {
         def proc = (commandExecutionPrefix+command).execute()
         proc.waitFor()
-        String result =  proc.in.text
-        println result
-        println proc.err.text
+        def result =  proc.in.text
+        log.fine result
+        def errors = proc.err.text
+        if (errors) {
+            log.warning errors
+        }
         return result
     }
 }

@@ -1,10 +1,14 @@
 package org.di.api.impl.carfax
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import groovy.json.JsonBuilder
+import groovy.json.JsonSlurper
 import org.di.api.ProjectSource
 import org.di.api.SourceRepository
 import org.di.engine.BuildRecord
 import org.di.engine.BuildRunner
 import org.di.engine.BulkDependencyIncrementer
+import org.di.engine.PastProjectSources
 import org.di.engine.SpanningTreeBuilder
 import org.di.graph.Edge
 import org.di.graph.Graph
@@ -31,15 +35,19 @@ public class Main {
     }
 
     static playWithPastProjectVersions(CarfaxLibSourceRepository repository) {
-        def gaga = repository.getPastProjectSources(repository.init())
-        gaga.each {project, pastProjects ->
+        def versionCounts = new PastProjectSources(localDir: new File('src/test/resources')).referencedVersionCounts()
+        def projects = repository.init()
+        projects.each { project ->
+           project.versions.each {version ->
+               if (versionCounts[project.name][version.toString()] == null) {
+                   versionCounts[project.name][version.toString()] = 0
+               }
+           }
+        }
+
+        versionCounts.each {project, versions ->
             println project
-            pastProjects.each { pastProject ->
-                println "  "+pastProject.version
-                pastProject.dependencies.each { dependency ->
-                   println "    "+dependency.projectSourceName + " "+dependency.version
-                }
-            }
+            println "   "+versions
         }
     }
 
