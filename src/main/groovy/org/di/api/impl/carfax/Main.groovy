@@ -44,11 +44,20 @@ public class Main {
                }
            }
         }
-
+        int referenced = 0
+        int unreferenced = 0
         versionCounts.each {project, versions ->
-            println project
+println project
             println "   "+versions
+            if (versions.find {k, v -> v > 0}) {
+                int haveRefs = versions.findAll {k, v -> v > 0}.size()
+               referenced +=  haveRefs
+               unreferenced += versions.size() - haveRefs
+            }
         }
+
+        println "referenced: "+referenced
+        println "unreferenced: "+unreferenced
     }
 
     static displayVersions(SourceRepository repository) {

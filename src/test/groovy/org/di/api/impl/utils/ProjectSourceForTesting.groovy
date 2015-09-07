@@ -10,6 +10,7 @@ class ProjectSourceForTesting implements ProjectSource {
 
     String name
     int version = 1
+    List<Integer> versions
     List<DependencyForTesting> dependencies = []
     boolean buildShouldWork = true
     long buildTimeMillis = 0
@@ -36,7 +37,11 @@ class ProjectSourceForTesting implements ProjectSource {
 
     @Override
     public List<Version> getVersions() {
-        return [getLatestVersion()]
+        if (versions == null) {
+            return [getLatestVersion()]
+        } else {
+            versions.collect {new VersionForTesting(value: it)}
+        }
     }
 
     @Override

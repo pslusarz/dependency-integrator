@@ -49,4 +49,11 @@ class VersionForTestingTest {
         assert !v3.before(v2)
     }
 
+    @Test
+    void testEquals() {
+        def v1 = new VersionForTesting(value: 234)
+        def v2 = new VersionForTesting(value: 234)
+        assert v1 == v2
+    }
+
 }
