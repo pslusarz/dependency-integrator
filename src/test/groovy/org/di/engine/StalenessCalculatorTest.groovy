@@ -2,7 +2,9 @@ package org.di.engine
 
 import org.di.api.impl.utils.SourceRepositoryForTesting
 import org.di.graph.Graph
+import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.ExpectedException
 
 class StalenessCalculatorTest {
 
@@ -58,6 +60,31 @@ class StalenessCalculatorTest {
         }))
         assert 2 == new StalenessCalculator(g).metric
 
+    }
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    @Test
+    void throwExceptionIfCannotFindReferencedVersion() {
+        Graph g = new Graph(new SourceRepositoryForTesting({
+            project {
+                name = "root"
+                version = 3
+                versions = [1,3]
+            }
+            project {
+                name = "child"
+                depends("root", 2)
+            }
+
+        }))
+        thrown.expect(RuntimeException)
+        thrown.expectMessage("Cannot find version VersionForTesting(2)")
+        thrown.expectMessage(" for project root")
+        thrown.expectMessage(" among versions [VersionForTesting(1), VersionForTesting(3)]")
+        thrown.expectMessage(" required by project child")
+        new StalenessCalculator(g).metric
     }
 
     //TODO: ignore cycles

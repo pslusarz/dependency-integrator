@@ -22,6 +22,9 @@ class StalenessCalculator {
                 //println "edge dependency: "+edge.dependency.version
                 //println "projectsource versions: "+projectSource.versions
                 int staleness = projectSource.versions.reverse().indexOf(edge.dependency.version)
+                if (staleness == -1) {
+                    throw new RuntimeException("Cannot find version "+edge.dependency.version.toString()+" for project "+projectSource.name+" among versions "+projectSource.versions+" required by project "+node.projectSource.name)
+                }
                 result += staleness
             }
           }
