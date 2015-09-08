@@ -22,10 +22,12 @@ class StalenessCalculator {
                 //println "edge dependency: "+edge.dependency.version
                 //println "projectsource versions: "+projectSource.versions
                 int staleness = projectSource.versions.reverse().indexOf(edge.dependency.version)
+                SpanningTreeBuilder spanningTreeBuilder = new SpanningTreeBuilder(world: graph, treeRoot: node.name)
+                int reachableEdges = spanningTreeBuilder.connectedProjects.size()
                 if (staleness == -1) {
-                    throw new RuntimeException("Cannot find version "+edge.dependency.version.toString()+" for project "+projectSource.name+" among versions "+projectSource.versions+" required by project "+node.projectSource.name)
+                    throw new RuntimeException("Cannot find version "+edge.dependency.version.toString()+" for project "+projectSource.name+" among versions "+projectSource.versions+" required by project "+node.name)
                 }
-                result += staleness
+                result += staleness * reachableEdges
             }
           }
         }

@@ -62,6 +62,61 @@ class StalenessCalculatorTest {
 
     }
 
+    @Test
+    void singleEdgeInRankedGraph() {
+        Graph g = new Graph(new SourceRepositoryForTesting({
+            project {
+                name = "root"
+                version = 6
+                versions = [1,2,3,4,5,6]
+            }
+            project {
+                name = "child"
+                depends("root")
+            }
+
+            project {
+                name = "grandchild"
+                depends("child")
+            }
+
+        }))
+        assert 10 == new StalenessCalculator(g).metric
+    }
+
+    @Test
+    void singleEdgeInterconnectedDiamond() {
+        Graph g = new Graph(new SourceRepositoryForTesting({
+            project {
+                name = "root"
+                version = 6
+                versions = [1,2,3,4,5,6]
+            }
+            project {
+                name = "diamond-bottom"
+                depends("root", 1)
+            }
+
+            project {
+                name = "diamond-left"
+                depends("diamond-bottom")
+            }
+            project {
+                name = "diamond-right"
+                depends("diamond-bottom")
+            }
+
+            project {
+                name = "diamond-top"
+                depends("diamond-left")
+                depends("diamond-right")
+                depends("diamond-bottom")
+            }
+
+        }))
+        assert 25 == new StalenessCalculator(g).metric
+    }
+
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
@@ -86,6 +141,8 @@ class StalenessCalculatorTest {
         thrown.expectMessage(" required by project child")
         new StalenessCalculator(g).metric
     }
+
+
 
     //TODO: ignore cycles
 
