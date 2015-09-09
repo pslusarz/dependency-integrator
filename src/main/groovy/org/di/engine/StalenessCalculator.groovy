@@ -27,7 +27,7 @@ class StalenessCalculator {
                 def edges = getConnectingEdges(spanningTreeBuilder.connectedProjects)
                 int reachableEdges = edges.size() + 1 //add current stale edge to the calculation
                 if (staleness == -1) {
-                    staleness = projectSource.versions.size() -1
+                    staleness = projectSource.versions.size()
                     //throw new RuntimeException("Cannot find version "+edge.dependency.version.toString()+" for project "+projectSource.name+" among versions "+projectSource.versions+" required by project "+node.name)
                     log.warning("Cannot find version "+edge.dependency.version.toString()+" for project "+projectSource.name+" among versions "+projectSource.versions+" required by project "+node.name)
                 }
