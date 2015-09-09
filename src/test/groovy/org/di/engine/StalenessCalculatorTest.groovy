@@ -117,6 +117,27 @@ class StalenessCalculatorTest {
         assert 30 == new StalenessCalculator(g).metric
     }
 
+    @Test
+    void isolatedSubtrees() {
+        Graph g = new Graph(new SourceRepositoryForTesting({
+            project {
+                name = "root"
+                version = 3
+                versions = [1,2,3]
+            }
+            project {
+                name = "left"
+                depends("root", 1)
+            }
+
+            project {
+                name = "right"
+                depends("root", 3)
+            }
+        }))
+        assert 2 == new StalenessCalculator(g).metric
+    }
+
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
@@ -142,7 +163,39 @@ class StalenessCalculatorTest {
         new StalenessCalculator(g).metric
     }
 
+    //Cases from blog: http://10kftcode.blogspot.com/2015/08/measuring-staleness-advanced-dependency.html
 
+    @Test
+    void firstExample() {
+        Graph g = new Graph(new SourceRepositoryForTesting({
+            project {
+                name = "10"
+                version = 8
+                versions = [1,2,3,4,5,6,7,8]
+            }
+            project {
+                name = "20"
+                depends("10", 3)
+            }
+
+            project {
+                name = "21"
+                depends("10", 1)
+            }
+
+            project {
+                name = "30"
+                depends("20")
+            }
+
+            project {
+                name = "31"
+                depends("20")
+                depends("21")
+            }
+        }))
+        assert 29 == new StalenessCalculator(g).metric
+    }
 
     //TODO: ignore cycles
 
