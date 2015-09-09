@@ -197,6 +197,76 @@ class StalenessCalculatorTest {
         assert 29 == new StalenessCalculator(g).metric
     }
 
+    @Test
+    void secondExamplePreIntegration() {
+        Graph g = new Graph(new SourceRepositoryForTesting({
+            project {
+                name = "10"
+                version = 5
+                versions = [1,2,3,4,5]
+            }
+            project {
+                name = "20"
+                version = 6
+                versions = [1,2,3,4,5,6]
+                depends("10", 1)
+            }
+
+            project {
+                name = "21"
+                depends("10", 3)
+            }
+
+            project {
+                name = "30"
+                depends("20", 1)
+            }
+
+            project {
+                name = "31"
+                depends("20", 3)
+                depends("21")
+            }
+        }))
+        assert 24 == new StalenessCalculator(g).metric
+    }
+
+    @Test
+    void secondExamplePostIntegration() {
+        Graph g = new Graph(new SourceRepositoryForTesting({
+            project {
+                name = "10"
+                version = 5
+                versions = [1,2,3,4,5]
+            }
+            project {
+                name = "20"
+                version = 10
+                versions = [1,2,3,4,5,6,7,8,9,10]
+                depends("10", 5) //latest
+            }
+
+            project {
+                name = "21"
+                version = 2
+                versions = [1,2]
+                depends("10", 5) //latest
+            }
+
+            project {
+                name = "30"
+                depends("20", 5)
+            }
+
+            project {
+                name = "31"
+                depends("20", 9)
+                depends("21",1)
+            }
+        }))
+        assert 7 == new StalenessCalculator(g).metric
+    }
+
     //TODO: ignore cycles
 
 
