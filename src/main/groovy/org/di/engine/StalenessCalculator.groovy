@@ -23,7 +23,8 @@ class StalenessCalculator {
                 //println "projectsource versions: "+projectSource.versions
                 int staleness = projectSource.versions.reverse().indexOf(edge.dependency.version)
                 SpanningTreeBuilder spanningTreeBuilder = new SpanningTreeBuilder(world: graph, treeRoot: node.name)
-                int reachableEdges = spanningTreeBuilder.connectedProjects.size()
+                def edges = getConnectingEdges(spanningTreeBuilder.connectedProjects)
+                int reachableEdges = edges.size() + 1 //add current stale edge to the calculation
                 if (staleness == -1) {
                     throw new RuntimeException("Cannot find version "+edge.dependency.version.toString()+" for project "+projectSource.name+" among versions "+projectSource.versions+" required by project "+node.name)
                 }
@@ -32,5 +33,9 @@ class StalenessCalculator {
           }
         }
         return result
+    }
+
+    private List<Edge> getConnectingEdges(Collection<Node> treeNodes) {
+      treeNodes.collect { it.outgoing.findAll{treeNodes.contains(it.to)}}.flatten()
     }
 }

@@ -9,7 +9,7 @@ class SpanningTreeBuilder {
     String treeRoot
 
 
-    Collection<ProjectSource> getConnectedProjects() {
+    Collection<Node> getConnectedProjects() {
         Node rootNode = world.nodes.find{it.name == treeRoot}
         if (!rootNode) {
             return []
@@ -21,7 +21,7 @@ class SpanningTreeBuilder {
         while(!stack.isEmpty()){
             getDependencies(stack.pop(), stack, foundNodes)
         }
-        return foundNodes.collect {it.projectSource}
+        return foundNodes
     }
 
     void getDependencies(Node visiting, List stack, Set visitedNodes){

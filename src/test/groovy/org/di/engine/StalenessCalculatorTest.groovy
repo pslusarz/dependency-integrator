@@ -114,7 +114,7 @@ class StalenessCalculatorTest {
             }
 
         }))
-        assert 25 == new StalenessCalculator(g).metric
+        assert 30 == new StalenessCalculator(g).metric
     }
 
     @Rule
