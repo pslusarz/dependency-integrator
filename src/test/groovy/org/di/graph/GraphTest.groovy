@@ -52,6 +52,25 @@ class GraphTest {
 
     }
 
+    @Test
+    void simpleCycle() {
+        SourceRepository sr = new SourceRepositoryForTesting({
+            project {
+                name = "a"
+                depends("b")
+            }
+            project {
+                name = "b"
+                depends ("a")
+            }
+        })
+
+        Graph g = new Graph(sr)
+        assert g.nodes.size() == 2
+        assert g.nodes.collect{it.outgoing}.flatten().size() == 2 //only 2 edges
+    }
+
+
 
 
 

@@ -72,16 +72,6 @@ class CarfaxGradleProjectSource extends ImmutableProjectSource implements Projec
 
     }
 
-    @Override
-    Collection<Dependency> getDependencies() {
-        if (dependencies) {
-            return dependencies
-        } else {
-            dependencies = parseFromDependenciesProperties()
-            dependencies.addAll(parseFromBuildGradle())
-            return dependencies
-        }
-    }
 
     @Override
     void setDependencyVersion(Dependency dependency, Version newVersion) {

@@ -10,6 +10,7 @@ import org.di.engine.BuildRunner
 import org.di.engine.BulkDependencyIncrementer
 import org.di.engine.PastProjectSources
 import org.di.engine.SpanningTreeBuilder
+import org.di.engine.StalenessCalculator
 import org.di.graph.Edge
 import org.di.graph.Graph
 import org.di.graph.Node
@@ -19,12 +20,20 @@ import org.di.graph.visualization.GraphVizGenerator
 public class Main {
     public static void main(String... args) {
         SourceRepository repository = new CarfaxLibSourceRepository(localDir: new File("work/project-sources/"));
-        playWithPastProjectVersions(repository)
+        staleness(repository)
+        //playWithPastProjectVersions(repository)
         //displayVersions(repository)
         //drawGraphWithFailed(repository)
         //repository.downloadAll()
         // updateOneProject(repository, "dealerautoreports-commons")
         // demo(repository)
+    }
+
+    static staleness(CarfaxLibSourceRepository repository) {
+        def projects = repository.init()
+        Graph g = new Graph(projects)
+        StalenessCalculator calc = new StalenessCalculator(g)
+        println calc.metric
     }
 
     static updateOne(String projectName, Collection<ProjectSource> projects) {

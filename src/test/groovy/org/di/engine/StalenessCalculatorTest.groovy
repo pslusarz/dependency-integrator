@@ -268,6 +268,25 @@ class StalenessCalculatorTest {
     }
 
     //TODO: ignore cycles
+    @Test
+    void wassupWithCycles() {
+        Graph g = new Graph(new SourceRepositoryForTesting({
+            project {
+                name = "a"
+                version = 5
+                versions = [1,2,3,4,5]
+                depends("b", 3)
+            }
+            project {
+                name = "b"
+                version = 6
+                versions = [1,2,3,4,5,6]
+                depends("a", 1)
+            }
+
+        }))
+        assert 7 == new StalenessCalculator(g).metric
+    }
 
 
 }

@@ -1,11 +1,12 @@
 package org.di.engine
 
+import groovy.util.logging.Log
 import org.di.api.ProjectSource
 import org.di.graph.Edge
 import org.di.graph.Graph
 import org.di.graph.Node
 
-
+@Log
 class StalenessCalculator {
     private Graph graph
 
@@ -26,7 +27,9 @@ class StalenessCalculator {
                 def edges = getConnectingEdges(spanningTreeBuilder.connectedProjects)
                 int reachableEdges = edges.size() + 1 //add current stale edge to the calculation
                 if (staleness == -1) {
-                    throw new RuntimeException("Cannot find version "+edge.dependency.version.toString()+" for project "+projectSource.name+" among versions "+projectSource.versions+" required by project "+node.name)
+                    staleness = projectSource.versions.size() -1
+                    //throw new RuntimeException("Cannot find version "+edge.dependency.version.toString()+" for project "+projectSource.name+" among versions "+projectSource.versions+" required by project "+node.name)
+                    log.warning("Cannot find version "+edge.dependency.version.toString()+" for project "+projectSource.name+" among versions "+projectSource.versions+" required by project "+node.name)
                 }
                 result += staleness * reachableEdges
             }
