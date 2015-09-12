@@ -6,6 +6,7 @@ import org.di.api.ProjectSource
 class Node {
     int rank = -1
     boolean buildFailed = false
+    Map tags = [:]
     ProjectSource projectSource
     List<Edge> outgoing = []
 

@@ -136,6 +136,15 @@ println project
         failedAfterUpdate.each {
             updates[it].rollback()
         }
+
+        def successfulUpdate = resultsAfterUpgrade.findAll { it.result == BuildRecord.BuildResult.Passed }.collect {
+            it.projectSource
+        }
+
+        successfulUpdate.each {
+            it.incrementVersion()
+            it.publishArtifactToTestRepo()
+        }
     }
 
     static demo(SourceRepository repository) {

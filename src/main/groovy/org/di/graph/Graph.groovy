@@ -8,6 +8,7 @@ class Graph {
     List<Node> nodes = []
     List<List<Node>> cycles
     boolean rankInit = false
+    int maxRank = -1
 
     Graph() {}
 
@@ -28,6 +29,9 @@ class Graph {
         }
     }
 
+    /**
+     * Used to reinitialize edges when dependencies change
+     */
     Graph rebuild() {
         return new Graph(nodes.collect{it.projectSource})
     }
@@ -97,6 +101,12 @@ class Graph {
                 }
             }
         }
+
+        maxRank = nodes.max {it.rank}.rank
+
+    }
+
+    public tagNodes(Collection<ProjectSource> projectSourcesToMatch, String tag) {
 
     }
 }
