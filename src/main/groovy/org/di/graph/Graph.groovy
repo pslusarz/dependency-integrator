@@ -80,7 +80,7 @@ class Graph {
         if (rankInit) {
             return
         }
-        if (!cycles) {
+        if (cycles == null) {
             initCycles()
         }
         def changed = true
