@@ -10,7 +10,7 @@ class ProjectSourceForTesting implements ProjectSource {
 
     String name
     int version = 1
-    List<Integer> versions
+    List<Integer> versions = [1]
     List<DependencyForTesting> dependencies = []
     boolean buildShouldWork = true
     long buildTimeMillis = 0
@@ -51,7 +51,9 @@ class ProjectSourceForTesting implements ProjectSource {
 
     @Override
     void publishArtifactToTestRepo() {
-
+      if (!versions.contains(version)) {
+          versions << version
+      }
     }
 
     @Override

@@ -19,7 +19,7 @@ class Updater {
     }
 
     def update() {
-        (1..graph.maxRank).each {
+        (2..graph.maxRank).each {
             updateRank(it)
         }
     }
