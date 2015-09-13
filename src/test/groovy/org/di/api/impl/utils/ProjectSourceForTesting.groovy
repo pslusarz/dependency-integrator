@@ -14,6 +14,7 @@ class ProjectSourceForTesting implements ProjectSource {
     List<DependencyForTesting> dependencies = []
     boolean buildShouldWork = true
     long buildTimeMillis = 0
+    Map<String, Integer> incompatibilities = [:]
 
     ProjectSourceForTesting(Closure config) {
         config.delegate = this
@@ -23,6 +24,10 @@ class ProjectSourceForTesting implements ProjectSource {
     def depends(String name, int version = 1) {
         def dep = new DependencyForTesting(projectSourceName: name, version: new VersionForTesting(value: version))
         dependencies << dep
+    }
+
+    def incompatibleWith(String name, int version) {
+      incompatibilities[name] = version
     }
 
     @Override
@@ -78,6 +83,11 @@ class ProjectSourceForTesting implements ProjectSource {
     @Override
     boolean build() {
         Thread.currentThread().sleep(buildTimeMillis)
+        dependencies.each { DependencyForTesting dependency ->
+            if (incompatibilities[dependency.projectSourceName] == dependency.version.value) {
+                buildShouldWork = false
+            }
+        }
         return buildShouldWork
     }
 }

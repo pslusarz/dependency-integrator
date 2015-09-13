@@ -103,4 +103,27 @@ class UpdaterTest {
         assert 0 == new StalenessCalculator(updater.graph).metric //new version of "child"
         assert updater.graph.nodes.find{it.name == "grandchild"}.outgoing[0].dependency.version.value == 3 //new version of child was produced
     }
+
+    @Test
+    void failedUpdateDependency() {
+        Updater updater = new Updater(new SourceRepositoryForTesting( {
+            project {
+                name = "parent"
+                version = 2
+                versions = [1,2]
+            }
+            project {
+                name = "child"
+                depends ("parent", 1)
+                incompatibleWith("parent", 2)
+            }
+        }
+        ))
+
+        assert 1 ==  new StalenessCalculator(updater.graph).metric
+        assert updater.graph.nodes.find{it.name == "child"}.outgoing[0].dependency.version.value == 1 //precondition
+        updater.update()
+        assert 1 == new StalenessCalculator(updater.graph).metric
+        assert updater.graph.nodes.find{it.name == "child"}.outgoing[0].dependency.version.value == 1
+    }
 }
