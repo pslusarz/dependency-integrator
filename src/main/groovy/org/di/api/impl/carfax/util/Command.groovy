@@ -14,19 +14,14 @@ class Command {
     }
 
     static String run(String command) {
-        println "git command: "+command
-        if (isWindows()) {
-            command = command.replaceAll("\\\\", "/")
-        }
-        println "git command: "+command
         def proc = (commandExecutionPrefix+command).execute()
         def out = new StringBuffer()
         def err = new StringBuffer()
         proc.consumeProcessOutput( out, err )
         proc.waitFor()
-        def result =  proc.out.toString()
+        def result =  out.toString()
         log.fine result
-        def errors = proc.err.toString()
+        def errors = err.toString()
         if (errors) {
             log.warning errors
         }
