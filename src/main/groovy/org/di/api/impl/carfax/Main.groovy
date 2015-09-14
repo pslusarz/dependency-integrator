@@ -11,6 +11,7 @@ import org.di.engine.BulkDependencyIncrementer
 import org.di.engine.PastProjectSources
 import org.di.engine.SpanningTreeBuilder
 import org.di.engine.StalenessCalculator
+import org.di.engine.Updater
 import org.di.graph.Edge
 import org.di.graph.Graph
 import org.di.graph.Node
@@ -20,13 +21,63 @@ import org.di.graph.visualization.GraphVizGenerator
 public class Main {
     public static void main(String... args) {
         SourceRepository repository = new CarfaxLibSourceRepository(localDir: new File("work/project-sources/"));
-        staleness(repository)
+        //git(repository.init())
+        //staleness(repository)
         //playWithPastProjectVersions(repository)
         //displayVersions(repository)
         //drawGraphWithFailed(repository)
         //repository.downloadAll()
         // updateOneProject(repository, "dealerautoreports-commons")
         // demo(repository)
+        updateOneAgain(repository, "dealerautoreports-commons")
+    }
+
+    static updateOneAgain(repository, projectName) {
+        Graph g = new Graph(repository)
+        Graph dependents = new Graph(new SpanningTreeBuilder(world: g, treeRoot: projectName).connectedProjects.collect {it.projectSource})
+
+        StalenessCalculator calc = new StalenessCalculator(dependents)
+        println "STALENESS: "+calc.metric
+        println "----- relative contribution per node:"
+        calc.nodeImpact.sort {- it.value}.each { node, impact ->
+            println node.name + " "+impact
+        }
+        println "----- most stale build files and their total cost:"
+        calc.outdatedProjectImpact.sort {- it.value}.each { node, impact ->
+            println node.name + " "+impact
+        }
+        println "======== UPDATING ========="
+        Updater updater = new Updater(dependents)
+        updater.update()
+        println "===========DONE UPDATING======"
+        StalenessCalculator calc2 = new StalenessCalculator(updater.graph)
+        println "STALENESS: "+calc2.metric
+        println "----- relative contribution per node:"
+        calc2.nodeImpact.sort {- it.value}.each { node, impact ->
+            println node.name + " "+impact
+        }
+        println "----- most stale build files and their total cost:"
+        calc2.outdatedProjectImpact.sort {- it.value}.each { node, impact ->
+            println node.name + " "+impact
+        }
+    }
+
+    static git(projects) {
+        projects[0..5].each {
+            it.publishArtifactToTestRepo()
+        }
+
+//        String cmd = "cmd /c git --git-dir=D:\\Projects\\dependency-integrator\\work\\project-sources\\vzlite/.git --no-pager --work-tree=D:\\Projects\\dependency-integrator\\work\\project-sources\\vzlite log --tags --grep=release --pretty=oneline"
+//        def proc = cmd.execute()
+//        def out = new StringBuffer()
+//        def err = new StringBuffer()
+//        proc.consumeProcessOutput( out, err )
+//        proc.waitFor()
+//        if( out.size() > 0 ) println out
+//        if( err.size() > 0 ) println err
+//
+//        println proc.in.text
+//        println proc.err.text
     }
 
     static staleness(CarfaxLibSourceRepository repository) {
@@ -40,6 +91,20 @@ public class Main {
         }
         println "----- most stale build files and their total cost:"
         calc.outdatedProjectImpact.sort {- it.value}.each { node, impact ->
+            println node.name + " "+impact
+        }
+        println "======== UPDATING ========="
+        Updater updater = new Updater(g)
+        updater.update()
+        println "===========DONE UPDATING======"
+        StalenessCalculator calc2 = new StalenessCalculator(updater.graph)
+        println "STALENESS: "+calc2.metric
+        println "----- relative contribution per node:"
+        calc2.nodeImpact.sort {- it.value}.each { node, impact ->
+            println node.name + " "+impact
+        }
+        println "----- most stale build files and their total cost:"
+        calc2.outdatedProjectImpact.sort {- it.value}.each { node, impact ->
             println node.name + " "+impact
         }
     }

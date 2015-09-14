@@ -65,12 +65,13 @@ class CarfaxGradleProjectSource extends ImmutableProjectSource implements Projec
 
     @Override
     void incrementVersion() {
+        Gradle(this, "makeNextReleaseVersion")
         /**
          * 1. run gradle bump version
          * 2. get new version from properties
          * 3. add it to the versions list... or tag and re-init?
          */
-        throw new RuntimeException("not implemented")
+        //throw new RuntimeException("not implemented")
     }
 
     @Override
