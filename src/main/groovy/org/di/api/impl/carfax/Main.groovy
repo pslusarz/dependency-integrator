@@ -33,7 +33,15 @@ public class Main {
         def projects = repository.init()
         Graph g = new Graph(projects)
         StalenessCalculator calc = new StalenessCalculator(g)
-        println calc.metric
+        println "STALENESS: "+calc.metric
+        println "----- relative contribution per node:"
+        calc.nodeImpact.sort {- it.value}.each { node, impact ->
+           println node.name + " "+impact
+        }
+        println "----- most stale build files and their total cost:"
+        calc.outdatedProjectImpact.sort {- it.value}.each { node, impact ->
+            println node.name + " "+impact
+        }
     }
 
     static updateOne(String projectName, Collection<ProjectSource> projects) {
@@ -100,52 +108,6 @@ println project
 //
 //    }
 
-    static updateLevel(SourceRepository repository, int rank) {
-        Map<ProjectSource, BulkDependencyIncrementer> updates = [:]
-        Graph g = new Graph(repository)
-        g.initRank()
-        g.nodes.findAll { it.rank == rank && it.outgoing.find { it.isStale() } }.each { Node node ->
-            println node.projectSource.name
-            node.outgoing.findAll { it.stale }.each { Edge edge ->
-                println "   " + edge.dependency.projectSourceName + "  " + edge.dependency.version + " (" + edge.to.projectSource.latestVersion + ")"
-
-            }
-            def update = new BulkDependencyIncrementer(node: node)
-            updates[node.projectSource] = update
-        }
-        BuildRunner br = new BuildRunner(projectSources: updates.keySet())
-        br.start(4)
-        List<BuildRecord> results = br.completeBuildRecords
-        def failedBeforeUpdate = results.findAll { it.result == BuildRecord.BuildResult.Failed }.collect {
-            it.projectSource
-        }
-        println "Failed before upgrade: " + failedBeforeUpdate
-        Map<ProjectSource, BulkDependencyIncrementer> candidates = updates.findAll {
-            !failedBeforeUpdate.contains(it.key)
-        }
-        candidates.each {
-            it.value.increment()
-        }
-        BuildRunner br2 = new BuildRunner(projectSources: candidates.keySet())
-        br2.start(4)
-        List<BuildRecord> resultsAfterUpgrade = br2.completeBuildRecords
-        def failedAfterUpdate = resultsAfterUpgrade.findAll { it.result == BuildRecord.BuildResult.Failed }.collect {
-            it.projectSource
-        }
-        println "Failed after update: " + failedAfterUpdate
-        failedAfterUpdate.each {
-            updates[it].rollback()
-        }
-
-        def successfulUpdate = resultsAfterUpgrade.findAll { it.result == BuildRecord.BuildResult.Passed }.collect {
-            it.projectSource
-        }
-
-        successfulUpdate.each {
-            it.incrementVersion()
-            it.publishArtifactToTestRepo()
-        }
-    }
 
     static demo(SourceRepository repository) {
         String projectName = "dealer-inventory-domain"
