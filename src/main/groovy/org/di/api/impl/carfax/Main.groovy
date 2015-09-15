@@ -21,6 +21,7 @@ import org.di.graph.visualization.GraphVizGenerator
 public class Main {
     public static void main(String... args) {
         SourceRepository repository = new CarfaxLibSourceRepository(localDir: new File("work/project-sources/"));
+        //repository.downloadAll()
         //git(repository.init())
         //staleness(repository)
         //playWithPastProjectVersions(repository)
@@ -29,10 +30,114 @@ public class Main {
         //repository.downloadAll()
         // updateOneProject(repository, "dealerautoreports-commons")
         // demo(repository)
-        updateOneAgain(repository, "dealerautoreports-commons")
+        //findAppropriateSubtree(repository)
+        updateOneAgain(repository, "carfax-product-commons")
+    }
+
+    static void findAppropriateSubtree(CarfaxLibSourceRepository repository) {
+        Graph g = new Graph(repository)
+        def results = g.nodes.collectEntries { Node node ->
+            Graph dependents = new Graph(new SpanningTreeBuilder(world: g, treeRoot: node.name).connectedProjects.collect {it.projectSource})
+            int staleness = new StalenessCalculator(dependents).metric
+            println node.name + " "+dependents.nodes.size()+" "+staleness
+            [node.projectSource, [dependents: dependents ?:[], staleness: staleness]]
+        }
+        results.sort {it.value.dependents.nodes.size()}.each { k, v ->
+            println v.dependents.nodes.size() + "  " +k.name + " "+v.staleness
+        }
+
+        """
+2  jaguar-common 1
+2  name-in-lights 3
+2  ProgressMonitoring 0
+2  rabbit-extensions 9
+2  rbs-domain 2
+2  struts1-extensions 0
+2  survey 3
+2  timing-utils-extensions 0
+2  velocity-extensions 0
+2  vhr-header-domain 2
+2  weblogic-admin-extensions 0
+3  bmc-impact-service 1
+3  configuration-domain 0
+3  partner-domain 3
+3  VzMetadata 4
+4  carfax-language-tools 23
+4  carfax-shared 24
+4  carfaxonline-encryption 13
+4  phoenix-permutation 37
+4  subscriber-domain 80
+4  vinlogger-files 0
+5  carfax-core-vindecode 1
+5  carfax-websidestory 32
+5  consumer-account-domain 242
+5  in-memory-database 24
+5  magrathea-internal 66
+5  purchase-domain 304
+5  webdriver-fitnesse-extensions 22
+6  alert-log-domain 352
+6  carfax-core-consumer 24
+6  carfax-core-utilities 242
+6  carfax-web-dbaccess 27
+6  magrathea-database-domain 71
+6  servlet-extensions 14
+6  webdriver-extensions 22
+6  xml-utils 2
+7  rest-client 242
+8  consumer-partner-domain 303
+8  postal-domain 80
+9  carfax-datetime-framework 30
+9  carfax-xinfo 35
+9  xml-testing 9
+10  carfax-product-commons 32
+10  consumer-tags 303
+10  dealerautoreports-commons 0
+10  rest-client-extensions 839
+11  dealerpartnerfitnesse 2
+11  report-delivery-domain 1108
+12  carfax-core-usage-acceptance 2
+12  corevip-acceptance 2
+12  test-helpers 3
+13  carfax-connection-manager 2
+13  dealer-inventory-domain-acceptance 74
+14  carfax-core-subscriber-acceptance 3
+14  CoreVip 63
+16  carfax-email-commons 70
+16  dealer-inventory-domain 654
+16  junit-extensions 418
+17  user-abstraction-layer-extensions 654
+18  carfax-core-subscriber 957
+18  carfax-fitnesse-commons 31
+18  spring-extensions 296
+19  carfax-oncontact-testing 1025
+20  carfax-assertions 957
+20  reflection-extensions 101
+22  carfax-db-utils 1035
+22  web-encryption-extensions 64
+23  dealer-user-domain 1106
+24  sql-framework-extensions 1106
+25  carfax-core-usage 1209
+29  configuration-extensions 133
+31  test-user-credentials-domain 1572
+33  carfax-messaging-commons 2665
+34  location-domain 2000
+35  sdb-domain 2000
+40  magrathea-domain 4911
+40  sql-extensions 1448
+41  ThreadedBatchManager 4984
+42  gson-extensions 4912
+43  carfax-spring-datasources 2936
+50  serialization-extensions 5370
+54  encryption-extensions 5441
+62  carfax-sql-framework 5823
+72  build-levels 10087
+85  oracle-connection-manager 10948
+86  carfax-connection-cache 11367
+"""
     }
 
     static updateOneAgain(repository, projectName) {
+
         Graph g = new Graph(repository)
         Graph dependents = new Graph(new SpanningTreeBuilder(world: g, treeRoot: projectName).connectedProjects.collect {it.projectSource})
 
