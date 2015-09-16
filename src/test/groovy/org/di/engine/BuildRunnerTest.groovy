@@ -25,6 +25,22 @@ class BuildRunnerTest {
     }
 
     @Test
+    void testFailWhenExceptionInBuild() {
+        def projects = [new ProjectSourceForTesting() {
+            @Override
+            boolean build() {
+                throw new RuntimeException("thou shall never build me")
+            }
+        }]
+        BuildRunner br = new BuildRunner(projectSources: projects)
+        br.start()
+        def results = br.completeBuildRecords
+        assert results
+        assert results.size() == 1
+        assert results[0].result == BuildRecord.BuildResult.Failed
+    }
+
+    @Test
     void testOnePassingOneFailing() {
         def projects = [
                 new ProjectSourceForTesting({

@@ -43,9 +43,13 @@ class BuildRunner {
         BuildRecord buildRecord
         @Override
         void run() {
-           boolean result = buildRecord.projectSource.build()
-           buildRecord.result = result ? BuildRecord.BuildResult.Passed : BuildRecord.BuildResult.Failed
-           buildRecord.stopEpoch = System.currentTimeMillis()
+           boolean result = false
+            try {
+                result = buildRecord.projectSource.build()
+            } finally {
+                buildRecord.result = result ? BuildRecord.BuildResult.Passed : BuildRecord.BuildResult.Failed
+                buildRecord.stopEpoch = System.currentTimeMillis()
+            }
         }
     }
 }
