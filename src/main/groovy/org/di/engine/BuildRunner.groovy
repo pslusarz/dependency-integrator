@@ -18,6 +18,7 @@ class BuildRunner {
           record.startEpoch = System.currentTimeMillis()
           executor.execute(new BuildRun(buildRecord: record))
         }
+        return this
     }
 
 
