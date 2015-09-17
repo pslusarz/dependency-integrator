@@ -23,24 +23,43 @@ import org.di.graph.visualization.GraphVizGenerator
 public class Main {
     public static void main(String... args) {
         SourceRepository repository = new CarfaxLibSourceRepository(localDir: new File("work/project-sources/"));
-        //repository.downloadAll()
-        //git(repository.init())
         //staleness(repository)
         //playWithPastProjectVersions(repository)
-        //displayVersions(repository)
         //drawGraphWithFailed(repository)
-        //repository.downloadAll()
         // updateOneProject(repository, "dealerautoreports-commons")
-        // demo(repository)
         //findAppropriateSubtree(repository)
         //updateOneAgain(repository, "vinalert-domain")
         testAll(repository)
-        //updatePlugins(repository)
+        //updatePluginsOnFailing(repository)
     }
-//http\://resolver/gradle/carfax/gradle/2.6/gradle-2.6.zip
-    static void updatePlugins(repository) {
+
+    static void updatePluginsOnFailing(repository) {
+        def failing = ['carfax-auction-bridge', 'carfax-connection-cache', 'carfax-core-utilities', 'carfax-cvs-navigator',
+                       'carfax-language-tools', 'carfax-product-commons', 'carfax-snmp', 'carfax-xinfo', 'configuration-domain',
+                       'configuration-extensions', 'controlm-web-service-client', 'datasource-provider-domain', 'datetime-converters-jackson',
+                       'dealer-inventory-domain-acceptance', 'dealer-user-domain-acceptance', 'encryption-extensions', 'grails-logging-defaults',
+                       'jaguar-common', 'jasmine-extensions', 'jspec-assertions', 'lucene-extensions', 'quickvin-client', 'rbs-domain',
+                       'reflection-extensions', 'silverpop-api', 'sql-extensions', 'weblogic-admin-extensions', 'carfax-websidestory',
+                       'coffeescript-extensions', 'cvs-repository-plugin', 'file-repository-plugin', 'git-repository-plugin', 'jaguar-vms',
+                       'jetty-extensions', 'location-domain', 'messaging-adapters', 'oracle-connection-manager', 'oracle-repository-plugin',
+                       'web-encryption-extensions', 'xml-http-fixture', 'xml-utils', 'carfax-product-glossary', 'carfax-spring-datasources',
+                       'carfax-struts-validator', 'carfax-testing', 'click-tracking-domain', 'consumer-partner-domain', 'fitnesse-wiki-widgets',
+                       'harness', 'hotlisting-connection-manager', 'magrathea-database-domain', 'phoenix-permutation', 'quickvin-domain',
+                       'rest-client-extensions', 'vin-exchange-domain', 'xml-service-domain', 'bbg-domain', 'carfax-assertions',
+                       'carfax-core-consumer', 'carfax-core-partner', 'carfax-core-usage-acceptance', 'carfax-messaging-commons', 'carfax-partner',
+                       'carfax-struts2-extensions', 'consumer-account-domain', 'CoreVip', 'magrathea-internal', 'partner-domain',
+                       'project-build-results', 'purchase-testing-internal', 'report-delivery-domain', 'sql-framework-extensions',
+                       'struts1-extensions', 'user-abstraction-layer-extensions', 'captcha-struts1-extensions', 'carfax-commons-controlm',
+                       'carfax-core-usage', 'carfax-web-dbaccess', 'consumer-email-domain', 'corevip-acceptance', 'dealer-user-domain',
+                       'survey', 'testhelpers', 'vhdata-cache-client', 'vzlite-dsl', 'auction-partner-internal', 'carfax-purchase-internal',
+                       'carfaxonline-auction-internal', 'survey-acceptance', 'carfax-core-subscriber-acceptance', 'carfax-shared',
+                       'carfaxonline-java', 'consumer-fitnesse', 'dealerpartnerfitnesse', 'name-in-lights', 'recordcheck-domain',
+                       'carfaxonline-java-acceptance', 'consumer-testing-internal', 'dealerautoreports-commons', 'name-in-lights-acceptance',
+                       'carfax-autoreports-summary', 'dealerautoreports-commons-acceptance', 'dealerautoreports-dataqualityengine',
+                       'vinlogger-files', 'carfax-autoreports-summary-acceptance', 'carfax-integrator-files',
+                       'DealerAutoReports-DataQualityEngine-acceptance', 'vinlogger-files-acceptance', 'carfax-integrator-files-acceptance']
         def projects = repository.init()
-        projects.each { CarfaxGradleProjectSource project ->
+        projects.findAll{failing.contains(it.name)}.each { CarfaxGradleProjectSource project ->
 
             println "Updating "+project.name
             updatePropertyInFile(new File(project.projectDirectory, "gradle.properties"), "carfaxPluginsVersion", "1.7.4")
@@ -155,23 +174,6 @@ public class Main {
         }
     }
 
-    static git(projects) {
-        projects[0..5].each {
-            it.publishArtifactToTestRepo()
-        }
-
-//        String cmd = "cmd /c git --git-dir=D:\\Projects\\dependency-integrator\\work\\project-sources\\vzlite/.git --no-pager --work-tree=D:\\Projects\\dependency-integrator\\work\\project-sources\\vzlite log --tags --grep=release --pretty=oneline"
-//        def proc = cmd.execute()
-//        def out = new StringBuffer()
-//        def err = new StringBuffer()
-//        proc.consumeProcessOutput( out, err )
-//        proc.waitFor()
-//        if( out.size() > 0 ) println out
-//        if( err.size() > 0 ) println err
-//
-//        println proc.in.text
-//        println proc.err.text
-    }
 
     static staleness(CarfaxLibSourceRepository repository) {
         def projects = repository.init()
@@ -202,12 +204,6 @@ public class Main {
         }
     }
 
-    static updateOne(String projectName, Collection<ProjectSource> projects) {
-        BulkDependencyIncrementer b = new BulkDependencyIncrementer(projectSource: projects.find {
-            it.name == projectName
-        }, projectSources: projects)
-        b.increment()
-    }
 
     static playWithPastProjectVersions(CarfaxLibSourceRepository repository) {
         def versionCounts = new PastProjectSources(localDir: new File('src/test/resources')).referencedVersionCounts()
@@ -235,13 +231,8 @@ public class Main {
         println "unreferenced: " + unreferenced
     }
 
-    static displayVersions(SourceRepository repository) {
-        List<ProjectSource> projectSources = repository.init()
-        projectSources.sort { -it.versions.size() }.each {
-            println it.name + "  " + it.versions.size()
-        }
-    }
 
+    //was using "dealer-inventory-domain" on demo
 //    static drawGraphWithFailed(SourceRepository repository) {
 //        def failedNames = ['carfax-auction-bridge', 'carfax-commons-controlm', 'carfax-core-consumer', 'carfax-cvs-navigator', 'carfax-logging-commons',
 //                           'carfax-product-commons', 'carfax-xinfo', 'carfaxonline-java-acceptance', 'coffeescript-extensions',
@@ -267,107 +258,7 @@ public class Main {
 //    }
 
 
-    static demo(SourceRepository repository) {
-        String projectName = "dealer-inventory-domain"
-        //repository.downloadAll()
-        Graph g = new Graph(repository)
-        Graph dependents = new Graph(new SpanningTreeBuilder(world: g, treeRoot: projectName).connectedProjects)
-        dependents.initRank()
-        def gv = new GraphVizGenerator(graph: dependents)
-//        gv.graph.nodes.each {
-//            println it.name + " " + it.rank
-//        }
-//        BuildRunner br = new BuildRunner(projectSources: dependents.nodes.collect {it.projectSource} )
-//        br.start(4)
-//        def results = br.completeBuildRecords
-//        results.findAll { it.result == BuildRecord.BuildResult.Failed }.each { currentBuild ->
-//            dependents.nodes.find {it.name == currentBuild.projectSource.name }.buildFailed = true
-//        }
-        //   dependents.nodes.find {it.name == 'dealerautoreports-commons-acceptance'}.buildFailed = true
 
-        gv.generate()
-        gv.reveal()
-        println "number of jars dependent on ${projectName}: " + (dependents.nodes.size() - 1)
-
-//        def rank= 2
-//        Map<Node, BulkDependencyIncrementer> incrementers = new HashMap<>().withDefault {node -> new BulkDependencyIncrementer(node: node)}
-//        Collection<Node> levelProjects = dependents.nodes.findAll {it.rank == rank && !it.buildFailed && incrementers[it].increment()}
-//        println "now will try to integrate rank ${rank}: "+ levelProjects
-//
-//        //levelProjects. {incrementers[it].increment()}
-//        BuildRunner br2 = new BuildRunner(projectSources: levelProjects.collect {it.projectSource} )
-//        br2.start(4)
-//        def results2 = br2.completeBuildRecords
-//        results2.findAll { it.result == BuildRecord.BuildResult.Failed }.each { currentBuild ->
-//            Node failed = levelProjects.find {it.name == currentBuild.projectSource.name }
-//            failed.outgoing.each {it.updateFailed = true}
-//            failed.buildFailed = true
-//            incrementers[failed].rollback()
-//        }
-//
-//
-//        gv.generate()
-//        gv.reveal()
-
-    }
-
-    static updateOneProject(SourceRepository repository, String projectName) {
-        repository.downloadAll()
-        Graph g = new Graph(repository)
-        Graph dependents = new Graph(new SpanningTreeBuilder(world: g, treeRoot: projectName).connectedProjects)
-        dependents.initRank()
-        def gv = new GraphVizGenerator(graph: dependents)
-        gv.graph.nodes.each {
-            println it.name + " " + it.rank
-        }
-//        BuildRunner br = new BuildRunner(projectSources: dependents.nodes.collect {it.projectSource} )
-//        br.start(4)
-//        def results = br.completeBuildRecords
-//        results.findAll { it.result == BuildRecord.BuildResult.Failed }.each { currentBuild ->
-//            dependents.nodes.find {it.name == currentBuild.projectSource.name }.buildFailed = true
-//        }
-        dependents.nodes.find { it.name == 'dealerautoreports-commons-acceptance' }.buildFailed = true
-
-        gv.generate()
-        gv.reveal()
-
-        def rank = 2
-        Map<Node, BulkDependencyIncrementer> incrementers = new HashMap<>().withDefault { node -> new BulkDependencyIncrementer(node: node) }
-        Collection<Node> levelProjects = dependents.nodes.findAll {
-            it.rank == rank && !it.buildFailed && incrementers[it].increment()
-        }
-        println "now will try to integrate rank ${rank}: " + levelProjects
-
-        //levelProjects. {incrementers[it].increment()}
-        BuildRunner br2 = new BuildRunner(projectSources: levelProjects.collect { it.projectSource })
-        br2.start(4)
-        def results2 = br2.completeBuildRecords
-        results2.findAll { it.result == BuildRecord.BuildResult.Failed }.each { currentBuild ->
-            Node failed = levelProjects.find { it.name == currentBuild.projectSource.name }
-            failed.outgoing.each { it.updateFailed = true }
-            failed.buildFailed = true
-            incrementers[failed].rollback()
-        }
-
-
-        gv.generate()
-        gv.reveal()
-
-    }
-
-
-    static buildAll(projects) {
-        long start = System.currentTimeMillis()
-        BuildRunner br = new BuildRunner(projectSources: projects)
-        br.start(8)
-        def results = br.completeBuildRecords
-        long stop = System.currentTimeMillis()
-        results.findAll { it.result == BuildRecord.BuildResult.Failed }.each {
-            println it.projectSource.name + " " + it.result
-        }
-
-        println "Total time (ms): " + (stop - start)
-    }
 
     static drawGraph(repository) {
         Graph g = new Graph(repository)
