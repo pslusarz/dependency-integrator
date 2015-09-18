@@ -23,41 +23,43 @@ import org.di.graph.visualization.GraphVizGenerator
 public class Main {
     public static void main(String... args) {
         SourceRepository repository = new CarfaxLibSourceRepository(localDir: new File("work/project-sources/"));
+        //repository.downloadAll()
         //staleness(repository)
         //playWithPastProjectVersions(repository)
         //drawGraphWithFailed(repository)
-        // updateOneProject(repository, "dealerautoreports-commons")
         //findAppropriateSubtree(repository)
-        //updateOneAgain(repository, "vinalert-domain")
-        testAll(repository)
+        updateOneAgain(repository, "phoenix-permutation")
+        //testAll(repository)
         //updatePluginsOnFailing(repository)
     }
 
     static void updatePluginsOnFailing(repository) {
-        def failing = ['carfax-auction-bridge', 'carfax-connection-cache', 'carfax-core-utilities', 'carfax-cvs-navigator',
-                       'carfax-language-tools', 'carfax-product-commons', 'carfax-snmp', 'carfax-xinfo', 'configuration-domain',
-                       'configuration-extensions', 'controlm-web-service-client', 'datasource-provider-domain', 'datetime-converters-jackson',
-                       'dealer-inventory-domain-acceptance', 'dealer-user-domain-acceptance', 'encryption-extensions', 'grails-logging-defaults',
-                       'jaguar-common', 'jasmine-extensions', 'jspec-assertions', 'lucene-extensions', 'quickvin-client', 'rbs-domain',
-                       'reflection-extensions', 'silverpop-api', 'sql-extensions', 'weblogic-admin-extensions', 'carfax-websidestory',
-                       'coffeescript-extensions', 'cvs-repository-plugin', 'file-repository-plugin', 'git-repository-plugin', 'jaguar-vms',
-                       'jetty-extensions', 'location-domain', 'messaging-adapters', 'oracle-connection-manager', 'oracle-repository-plugin',
-                       'web-encryption-extensions', 'xml-http-fixture', 'xml-utils', 'carfax-product-glossary', 'carfax-spring-datasources',
-                       'carfax-struts-validator', 'carfax-testing', 'click-tracking-domain', 'consumer-partner-domain', 'fitnesse-wiki-widgets',
-                       'harness', 'hotlisting-connection-manager', 'magrathea-database-domain', 'phoenix-permutation', 'quickvin-domain',
-                       'rest-client-extensions', 'vin-exchange-domain', 'xml-service-domain', 'bbg-domain', 'carfax-assertions',
-                       'carfax-core-consumer', 'carfax-core-partner', 'carfax-core-usage-acceptance', 'carfax-messaging-commons', 'carfax-partner',
-                       'carfax-struts2-extensions', 'consumer-account-domain', 'CoreVip', 'magrathea-internal', 'partner-domain',
-                       'project-build-results', 'purchase-testing-internal', 'report-delivery-domain', 'sql-framework-extensions',
-                       'struts1-extensions', 'user-abstraction-layer-extensions', 'captcha-struts1-extensions', 'carfax-commons-controlm',
-                       'carfax-core-usage', 'carfax-web-dbaccess', 'consumer-email-domain', 'corevip-acceptance', 'dealer-user-domain',
-                       'survey', 'testhelpers', 'vhdata-cache-client', 'vzlite-dsl', 'auction-partner-internal', 'carfax-purchase-internal',
-                       'carfaxonline-auction-internal', 'survey-acceptance', 'carfax-core-subscriber-acceptance', 'carfax-shared',
-                       'carfaxonline-java', 'consumer-fitnesse', 'dealerpartnerfitnesse', 'name-in-lights', 'recordcheck-domain',
-                       'carfaxonline-java-acceptance', 'consumer-testing-internal', 'dealerautoreports-commons', 'name-in-lights-acceptance',
-                       'carfax-autoreports-summary', 'dealerautoreports-commons-acceptance', 'dealerautoreports-dataqualityengine',
-                       'vinlogger-files', 'carfax-autoreports-summary-acceptance', 'carfax-integrator-files',
-                       'DealerAutoReports-DataQualityEngine-acceptance', 'vinlogger-files-acceptance', 'carfax-integrator-files-acceptance']
+        def failing = ['bbg-domain', 'captcha-struts1-extensions', 'carfax-assertions',
+                       'carfax-autoreports-summary', 'carfax-autoreports-summary-acceptance', 'carfax-branding-domain',
+                       'carfax-commons-controlm', 'carfax-connection-cache', 'carfax-core-subscriber-acceptance',
+                       'carfax-core-usage', 'carfax-core-usage-acceptance', 'carfax-core-utilities', 'carfax-cvs-navigator',
+                       'carfax-integrator-files-acceptance', 'carfax-language-tools', 'carfax-messaging-commons',
+                       'carfax-partner', 'carfax-product-commons', 'carfax-product-glossary', 'carfax-purchase-internal',
+                       'carfax-shared', 'carfax-snmp', 'carfax-spring-datasources', 'carfax-struts-validator',
+                       'carfax-struts2-extensions', 'carfax-testing', 'carfax-web-dbaccess', 'carfax-websidestory',
+                       'carfax-xinfo', 'carfaxonline-auction-internal', 'carfaxonline-java', 'click-tracking-domain',
+                       'configuration-domain', 'configuration-extensions', 'consumer-account-domain', 'consumer-email-domain',
+                       'consumer-fitnesse', 'consumer-partner-domain', 'consumer-testing-internal', 'controlm-web-service-client',
+                       'CoreVip', 'corevip-acceptance', 'cvs-repository-plugin', 'datasource-provider-domain',
+                       'dealer-inventory-domain-acceptance', 'dealer-user-domain', 'dealer-user-domain-acceptance',
+                       'dealerautoreports-commons-acceptance', 'dealerautoreports-dataqualityengine',
+                       'DealerAutoReports-DataQualityEngine-acceptance', 'dealerpartnerfitnesse',
+                       'encryption-extensions', 'fitnesse-wiki-widgets', 'git-repository-plugin', 'harness',
+                       'hotlisting-connection-manager', 'jaguar-common', 'jaguar-vms', 'jasmine-extensions',
+                       'jetty-extensions', 'jspec-assertions', 'location-domain', 'lucene-extensions',
+                       'magrathea-database-domain', 'magrathea-internal', 'messaging-adapters', 'name-in-lights',
+                       'name-in-lights-acceptance', 'oracle-connection-manager', 'oracle-repository-plugin', 'partner-domain',
+                       'phoenix-permutation', 'project-build-results', 'purchase-testing-internal', 'quickvin-client', 'quickvin-domain',
+                       'rbs-domain', 'recordcheck-domain', 'reflection-extensions', 'report-delivery-domain', 'rest-client-extensions',
+                       'silverpop-api', 'spring-extensions', 'sql-extensions', 'sql-framework-extensions', 'struts1-extensions',
+                       'survey', 'survey-acceptance', 'testhelpers', 'user-abstraction-layer-extensions', 'vhdata-cache-client',
+                       'vin-exchange-domain', 'vinlogger-files', 'vinlogger-files-acceptance', 'vzlite-dsl', 'web-encryption-extensions',
+                       'weblogic-admin-extensions', 'xml-http-fixture', 'xml-service-domain']
         def projects = repository.init()
         projects.findAll{failing.contains(it.name)}.each { CarfaxGradleProjectSource project ->
 
@@ -91,7 +93,7 @@ public class Main {
         long start = System.currentTimeMillis()
         def results = new BuildRunner(projectSources: projects).start().completeBuildRecords
         long length = System.currentTimeMillis() - start
-        println "RUNNNING ALL TEST TOOK: " + length
+        println "RUNNNING ALL TESTS TOOK: " + length
 
         results.findAll { it.result == BuildRecord.BuildResult.Failed }.each { BuildRecord record ->
             graph.nodes.find { it.name == record.projectSource.name }.buildFailed = true
@@ -114,6 +116,8 @@ public class Main {
         }
         println "FAILED: " + failedProjectNodes.groupBy { it.rank }.sort()
         println "PASSED: " + passingProjectNodes.groupBy { it.rank }.sort()
+
+        println "STALENESS: "+ new StalenessCalculator(graph).metric
 
 
     }
