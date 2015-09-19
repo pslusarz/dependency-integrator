@@ -23,6 +23,9 @@ apply plugin: 'carfax-library-jar'
 dependencies {
    compile 'carfax:vzlite:2.1.20'
    compile 'com.google.guava:guava:r07'
+   compile ('carfax:postal-domain:2.9.0')
+   compile('carfax:paren-no-space-domain:2.9.0')
+   compile("carfax:paren-no-space-doublequote-domain:2.7.0")
    //compile 'carfax:carfax-sql-framework:3.0.0'
    testCompile 'carfax:magrathea-database-domain:2.0.4'
    testCompile 'com.carfax.db:db-connect-properties:1.0.11'
@@ -34,10 +37,12 @@ dependencies {
         assert projectSource.dependencies.find{it.projectSourceName == 'vzlite'}.version.toString() == '2.1.20'
         assert projectSource.dependencies.find{it.projectSourceName == 'magrathea-database-domain'}
         assert projectSource.dependencies.find{it.projectSourceName == 'magrathea-database-domain'}.version.toString() == '2.0.4'
-        assert !projectSource.dependencies.find{it.projectSourceName == 'db-connect-properties'}
-        assert !projectSource.dependencies.find{it.projectSourceName == 'guava'}
-        assert !projectSource.dependencies.find{it.projectSourceName == 'carfax-sql-framework'}
-
+        assert !projectSource.dependencies.find{it.projectSourceName == 'db-connect-properties'} //org is not standard 'carfax'
+        assert !projectSource.dependencies.find{it.projectSourceName == 'guava'} // not carfax
+        assert !projectSource.dependencies.find{it.projectSourceName == 'carfax-sql-framework'} //commented out
+        assert projectSource.dependencies.find{it.projectSourceName == 'postal-domain'} //parenthesis
+        assert projectSource.dependencies.find{it.projectSourceName == 'paren-no-space-domain'}
+        assert projectSource.dependencies.find{it.projectSourceName == 'paren-no-space-doublequote-domain'}
 
 
     }
