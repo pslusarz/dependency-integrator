@@ -40,7 +40,7 @@ class ImmutableProjectSource {
     def parseFromBuildGradle() {
         def result = []
         def lines = new File(projectDirectory, "build.gradle").readLines()
-        lines.findAll { it.contains('carfax:') }.each { line -> // compile 'carfax:serialization-extensions:3.1.1'
+        lines.findAll { it.contains('carfax:') && ! it.trim().startsWith("//")}.each { line -> // compile 'carfax:serialization-extensions:3.1.1'
             try {
                 String depChunk = line.split(/['|"]/)[1] //carfax:serialization-extensions:3.1.1
                 String[] depChunk2 = depChunk.split(':')

@@ -14,11 +14,14 @@ class GraphVizGenerator {
     String commandExecutionPrefix
     String commandOpenPrefix
     String shape = "point"
+    String label=""
+    String uniqueFileName = ""
 
     GraphVizGenerator() {
-        script = new File(System.getProperty("java.io.tmpdir")+"/di.dot")
+        uniqueFileName = label+System.currentTimeMillis().toString()
+        script = new File(System.getProperty("java.io.tmpdir")+"/di-${uniqueFileName}.dot")
         script.delete()
-        graphic = new File(System.getProperty("java.io.tmpdir")+"/di.${outputType}")
+        graphic = new File(System.getProperty("java.io.tmpdir")+"/di-${uniqueFileName}.${outputType}")
         graphic.delete()
         if (System.getProperty("os.name").startsWith("Windows")) {
            dotCommandLocation = "C:\\cfx\\graphviz\\bin\\dot.exe"
@@ -33,7 +36,7 @@ class GraphVizGenerator {
 
     def generate() {
         graph.initRank()
-        String content = "digraph G { ranksep=1; nodesep=0.1; node [shape=${shape},width=.95,height=.95];\n"
+        String content = "digraph G { ranksep=1; label=\"${label}\"; nodesep=0.1; node [shape=${shape},width=.95,height=.95];\n"
         def levels = graph.nodes.groupBy {it.rank}.keySet().sort{-it}
         content += "  {  node [shape=none]; edge [style=invis]; \n"
         content += "    "+levels.join(" -> ")
@@ -52,7 +55,7 @@ class GraphVizGenerator {
                 String edgeStyle = ""
                 if (dependency.isStale() ) {
                     edgeStyle =  "[color=red,style=\"setlinewidth(4)\"]"
-                    println node.projectSource.name + " depends on "+dependency.to.name + " version "+dependency.dependency.version.toString()+ " ("+dependency.to.projectSource.latestVersion.toString()+")"
+                    //println node.projectSource.name + " depends on "+dependency.to.name + " version "+dependency.dependency.version.toString()+ " ("+dependency.to.projectSource.latestVersion.toString()+")"
                 }
                 if (dependency.cyclic) {
                     edgeStyle = "[color=blue,style=\"setlinewidth(8)\"]"
