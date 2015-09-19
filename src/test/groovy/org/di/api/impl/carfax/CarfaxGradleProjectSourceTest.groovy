@@ -47,8 +47,26 @@ dependencies {
 
     }
 
+    @Test
+    void updateDependencyInGradleFile() {
+        buildFile << """
+dependencies {
+   compile 'carfax:vzlite:2.1.20'
+   testCompile( 'carfax:magrathea-database-domain:2.0.4')
+}
+"""
+        CarfaxGradleProjectSource projectSource = new CarfaxGradleProjectSource(projectDir)
+        projectSource.setDependencyVersion(projectSource.dependencies.find {it.projectSourceName == 'vzlite'}, new StringMajorMinorPatchVersion("3.2.0"))
+        projectSource.setDependencyVersion(projectSource.dependencies.find {it.projectSourceName == 'magrathea-database-domain'}, new StringMajorMinorPatchVersion("9.1.1"))
+
+        CarfaxGradleProjectSource projectSource2 = new CarfaxGradleProjectSource(projectDir)
+        assert projectSource2.dependencies.find {it.projectSourceName == 'vzlite'}.version.toString() == '3.2.0' //compile config
+        assert projectSource2.dependencies.find {it.projectSourceName == 'magrathea-database-domain'}.version.toString() == '9.1.1' //testCompile config
+    }
+
     @After
     void tearDown() {
         projectDir.deleteDir()
+        //"open ${projectDir.absolutePath}".execute()
     }
 }
