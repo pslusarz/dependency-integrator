@@ -10,6 +10,7 @@ import org.di.graph.Node
 @Log
 class Updater {
     Graph graph
+    int numberOfThreads = 4
     public Updater(Graph graph) {
         graph.initRank()
         this.graph = graph
@@ -38,23 +39,24 @@ class Updater {
             def update = new BulkDependencyIncrementer(node: node)
             updates[node.projectSource] = update
         }
-        BuildRunner br = new BuildRunner(projectSources: updates.keySet())
-        br.start(4)
-        List<BuildRecord> results = br.completeBuildRecords
-        def failedBeforeUpdate = results.findAll { it.result == BuildRecord.BuildResult.Failed }.collect {
-            it.projectSource
-        }
-
-        graph.tagNodes(failedBeforeUpdate, 'failedBeforeUpdate')
-        log.info "    Failed before update: " + failedBeforeUpdate
-        Map<ProjectSource, BulkDependencyIncrementer> candidates = updates.findAll {
-            !failedBeforeUpdate.contains(it.key)
-        }
+//        BuildRunner br = new BuildRunner(projectSources: updates.keySet())
+//        br.start(numberOfThreads)
+//        List<BuildRecord> results = br.completeBuildRecords
+//        def failedBeforeUpdate = results.findAll { it.result == BuildRecord.BuildResult.Failed }.collect {
+//            it.projectSource
+//        }
+//
+//        graph.tagNodes(failedBeforeUpdate, 'failedBeforeUpdate')
+//        log.info "    Failed before update: " + failedBeforeUpdate
+//        Map<ProjectSource, BulkDependencyIncrementer> candidates = updates.findAll {
+//            !failedBeforeUpdate.contains(it.key)
+//        }
+        def candidates = updates.findAll {true}
         candidates.each {
             it.value.increment()
         }
         BuildRunner br2 = new BuildRunner(projectSources: candidates.keySet())
-        br2.start(4)
+        br2.start(numberOfThreads)
         List<BuildRecord> resultsAfterUpgrade = br2.completeBuildRecords
         def failedAfterUpdate = resultsAfterUpgrade.findAll { it.result == BuildRecord.BuildResult.Failed }.collect {
             it.projectSource

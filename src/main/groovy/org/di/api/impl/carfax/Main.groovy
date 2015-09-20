@@ -164,6 +164,7 @@ public class Main {
         }
         println "======== UPDATING ========="
         Updater updater = new Updater(dependents)
+        updater.numberOfThreads = 8
         updater.update()
         println "===========DONE UPDATING======"
         StalenessCalculator calc2 = new StalenessCalculator(updater.graph)
@@ -194,6 +195,7 @@ public class Main {
         }
         println "======== UPDATING ========="
         Updater updater = new Updater(g)
+        updater.numberOfThreads = 8
         updater.update()
         println "===========DONE UPDATING======"
         StalenessCalculator calc2 = new StalenessCalculator(updater.graph)
