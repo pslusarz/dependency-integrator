@@ -16,6 +16,8 @@ class ProjectSourceForTesting implements ProjectSource {
     long buildTimeMillis = 0
     Map<String, Integer> incompatibilities = [:]
 
+    ProjectSourceForTesting(){}
+
     ProjectSourceForTesting(Closure config) {
         config.delegate = this
         config.call()
