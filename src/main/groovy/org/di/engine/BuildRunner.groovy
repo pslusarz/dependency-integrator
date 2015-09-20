@@ -15,7 +15,7 @@ class BuildRunner {
        buildRecords.addAll(projectSources.collect {new BuildRecord(projectSource: it)})
        executor = Executors.newFixedThreadPool(numberOfThreads)
         buildRecords.each { record ->
-          record.startEpoch = System.currentTimeMillis()
+          record.createEpoch = System.currentTimeMillis()
           executor.execute(new BuildRun(buildRecord: record))
         }
         return this
@@ -46,6 +46,7 @@ class BuildRunner {
         void run() {
            boolean result = false
             try {
+                buildRecord.startEpoch = System.currentTimeMillis()
                 result = buildRecord.projectSource.build()
             } finally {
                 buildRecord.result = result ? BuildRecord.BuildResult.Passed : BuildRecord.BuildResult.Failed

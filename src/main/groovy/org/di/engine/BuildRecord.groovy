@@ -5,6 +5,7 @@ import org.di.api.ProjectSource
 
 class BuildRecord {
     ProjectSource projectSource
+    long createEpoch = -1
     //public enum BuildStatus {NotStarted, Running, Finished}
     public enum BuildResult {Passed, Failed, Unknown}
 
