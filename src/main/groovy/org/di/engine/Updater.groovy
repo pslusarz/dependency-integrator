@@ -39,27 +39,35 @@ class Updater {
             def update = new BulkDependencyIncrementer(node: node)
             updates[node.projectSource] = update
         }
-//        BuildRunner br = new BuildRunner(projectSources: updates.keySet())
-//        br.start(numberOfThreads)
-//        List<BuildRecord> results = br.completeBuildRecords
-//        def failedBeforeUpdate = results.findAll { it.result == BuildRecord.BuildResult.Failed }.collect {
-//            it.projectSource
-//        }
-//
-//        graph.tagNodes(failedBeforeUpdate, 'failedBeforeUpdate')
-//        log.info "    Failed before update: " + failedBeforeUpdate
-//        Map<ProjectSource, BulkDependencyIncrementer> candidates = updates.findAll {
+        BuildRunner br = new BuildRunner(projectSources: updates.keySet())
+        br.start(numberOfThreads)
+        List<BuildRecord> results = br.completeBuildRecords
+        def failedBeforeUpdate = results.findAll { it.result == BuildRecord.BuildResult.Failed }.collect {
+            it.projectSource
+        }
+
+        graph.tagNodes(failedBeforeUpdate, 'failedBeforeUpdate')
+        log.info "    Failed before update: " + failedBeforeUpdate
+        Map<ProjectSource, BulkDependencyIncrementer> candidates = updates.findAll { true}
 //            !failedBeforeUpdate.contains(it.key)
 //        }
-        def candidates = updates.findAll {true}
         candidates.each {
             it.value.increment()
         }
-        BuildRunner br2 = new BuildRunner(projectSources: candidates.keySet())
-        br2.start(numberOfThreads)
-        List<BuildRecord> resultsAfterUpgrade = br2.completeBuildRecords
-        def failedAfterUpdate = resultsAfterUpgrade.findAll { it.result == BuildRecord.BuildResult.Failed }.collect {
-            it.projectSource
+
+
+        def failedAfterUpdate = candidates.keySet()
+        (1..4).each {
+            if (failedAfterUpdate.size() > 0) {
+                BuildRunner br2 = new BuildRunner(projectSources: failedAfterUpdate)
+                br2.start(numberOfThreads)
+                List<BuildRecord> resultsAfterUpgrade = br2.completeBuildRecords
+                failedAfterUpdate = resultsAfterUpgrade.findAll {
+                    it.result == BuildRecord.BuildResult.Failed
+                }.collect {
+                    it.projectSource
+                }
+            }
         }
         log.info "    Failed after update: " + failedAfterUpdate
         failedAfterUpdate.each { failed ->
@@ -68,11 +76,14 @@ class Updater {
         graph.tagNodes(failedAfterUpdate, 'failedAfterUpdate')
 
 
-        def successfulUpdate = resultsAfterUpgrade.findAll { it.result == BuildRecord.BuildResult.Passed }.collect {
-            it.projectSource
-        }
+        def successfulUpdate = candidates.keySet()
+        successfulUpdate.removeAll(failedAfterUpdate)
+//                resultsAfterUpgrade.findAll { it.result == BuildRecord.BuildResult.Passed }.collect {
+//            it.projectSource
+//        }
 
         successfulUpdate.each { successful ->
+           // println successful.class
             successful.incrementVersion()
             successful.publishArtifactToTestRepo()
         }
