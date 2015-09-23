@@ -28,10 +28,42 @@ public class Main {
         //playWithPastProjectVersions(repository)
         //drawGraphWithFailed(repository)
         //findAppropriateSubtree(repository)
-        updateOneAgain(repository, "phoenix-permutation")
+        //updateOneAgain(repository, "phoenix-permutation")
         //testAll(repository)
         //updatePluginsOnFailing(repository)
+        //changeImpact(repository)
+        drawGraph(repository)
     }
+
+    static void changeImpact(CarfaxLibSourceRepository carfaxLibSourceRepository) {
+        Graph g = new Graph(carfaxLibSourceRepository)
+        StalenessCalculator calculator = new StalenessCalculator(g)
+
+        int totalCost = g.nodes.collectEntries { Node node ->
+          [node, calculator.getChangeImpact(node) * node.projectSource.versions.size()]
+        }.values().sum()
+        println totalCost
+        println totalCost / 700
+    }
+
+    static def costly =
+            ['magrathea-domain',
+             'magrathea-internal',
+             'dealer-inventory-domain',
+             'carfax-messaging-commons'
+//             ,
+//             'vzlite',
+//             'oracle-connection-manager',
+//             'carfax-core-usage',
+//             'report-delivery-domain',
+//             'dealer-user-domain',
+//             'consumer-account-domain',
+//             'subscriber-domain',
+//             'carfax-core-subscriber',
+//             'serialization-extensions',
+//             'carfax-sql-framework',
+//             'magrathea-database-domain'
+            ]
 
     static void updatePluginsOnFailing(repository) {
         def failing = ['bbg-domain', 'captcha-struts1-extensions', 'carfax-assertions',
@@ -272,6 +304,7 @@ public class Main {
         g.cycles.each {
             println it
         }
+        g.nodes.findAll{costly.contains(it.name)}.each {it.buildFailed = true}
         def gv = new GraphVizGenerator(graph: g)
         gv.generate()
         gv.reveal()
