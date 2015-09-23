@@ -48,6 +48,16 @@ class StalenessCalculator {
         return result
     }
 
+    int getChangeImpact(Node node) {
+        !node.outgoing.size() ? 0 :
+        node.outgoing.sum { Edge edge ->
+                SpanningTreeBuilder spanningTreeBuilder = new SpanningTreeBuilder(world: graph, treeRoot: node.name)
+                def edges = getConnectingEdges(spanningTreeBuilder.connectedProjects)
+                edges.size() + 1 //add current stale edge to the calculation
+
+        }
+    }
+
     private List<Edge> getConnectingEdges(Collection<Node> treeNodes) {
         treeNodes.collect { it.outgoing.findAll { treeNodes.contains(it.to) } }.flatten()
     }
