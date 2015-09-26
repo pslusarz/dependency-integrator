@@ -65,7 +65,7 @@ class CarfaxGradleProjectSource extends ImmutableProjectSource implements Projec
 
     @Override
     void incrementVersion() {
-        Gradle.run(this, "makeNextReleaseVersion")
+        Gradle.run(this, "makeNextReleaseVersion -x checkForUncommittedChanges")
         /**
          * 1. run gradle bump version
          * 2. get new version from properties

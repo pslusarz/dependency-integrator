@@ -23,7 +23,7 @@ class Command {
         log.fine result
         def errors = err.toString()
         if (errors) {
-            log.warning errors
+            log.warning "Command '${command}' generated error output: "+ errors
         }
         return result
     }
