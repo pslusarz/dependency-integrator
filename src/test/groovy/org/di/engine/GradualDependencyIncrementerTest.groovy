@@ -18,12 +18,12 @@ class GradualDependencyIncrementerTest {
                 version = 2
             }
         }))
-        def di = new GradualDependencyIncrementer(node: g.nodes.find { it.name == "one" })
+        def di = new GradualDependencyIncrementer(node: g.node("one"))
         def incremented1 = di.increment()
         assert incremented1
         def incremented2 = di.increment()
         assert !incremented2
-        def currentDependency = g.rebuild().nodes.find{it.name == "one"}.outgoing.find{it.to.name == "current"}.dependency //projects.find {it.name == "one"}.dependencies.find{it.projectSourceName == "current"}
+        def currentDependency = g.rebuild().node("one").outgoing("current").dependency //projects.find {it.name == "one"}.dependencies.find{it.projectSourceName == "current"}
         assert currentDependency.version == new VersionForTesting(value: 2)
     }
 
@@ -39,16 +39,16 @@ class GradualDependencyIncrementerTest {
                 version = 3
             }
         }))
-        def di = new GradualDependencyIncrementer(node: g.nodes.find { it.name == "one" })
+        def di = new GradualDependencyIncrementer(node: g.node("one"))
 
         def incremented1 = di.increment()
         assert incremented1
-        def currentDependency = g.rebuild().nodes.find{it.name == "one"}.outgoing.find{it.to.name == "current"}.dependency //projects.find {it.name == "one"}.dependencies.find{it.projectSourceName == "current"}
+        def currentDependency = g.rebuild().node("one").outgoing("current").dependency //projects.find {it.name == "one"}.dependencies.find{it.projectSourceName == "current"}
         assert currentDependency.version == new VersionForTesting(value: 2)
 
         def incremented2 = di.increment()
         assert incremented2
-        currentDependency = g.rebuild().nodes.find{it.name == "one"}.outgoing.find{it.to.name == "current"}.dependency //projects.find {it.name == "one"}.dependencies.find{it.projectSourceName == "current"}
+        currentDependency = g.rebuild().node("one").outgoing("current").dependency //projects.find {it.name == "one"}.dependencies.find{it.projectSourceName == "current"}
         assert currentDependency.version == new VersionForTesting(value: 3)
 
         assert !di.increment()
@@ -66,13 +66,13 @@ class GradualDependencyIncrementerTest {
                 version = 2
             }
         }))
-        def di = new GradualDependencyIncrementer(node: g.nodes.find { it.name == "one" })
+        def di = new GradualDependencyIncrementer(node: g.node("one"))
 
         di.increment()
         di.rollback()
-        def currentDependency = g.rebuild().nodes.find{it.name == "one"}.outgoing.find{it.to.name == "current"}.dependency
+        def currentDependency = g.rebuild().node("one").outgoing("current").dependency
         assert currentDependency.version == new VersionForTesting(value: 1) //node
-        assert g.rebuild().nodes.find{it.name == "one"}.projectSource.dependencies.find {it.projectSourceName == "current"}.version == new VersionForTesting(value: 1) //project associated with node
+        assert g.rebuild().node("one").projectSource.dependencies.find {it.projectSourceName == "current"}.version == new VersionForTesting(value: 1) //project associated with node
 
     }
 }

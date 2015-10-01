@@ -107,7 +107,7 @@ class GraphCycleDetectionTest {
 
         assert g.cycles[0].collect {it.name}.containsAll (["tertius", "secundus"])
 
-        assert !g.nodes.find { it.name == "primus" }.outgoing.first().cyclic
+        assert !g.node("primus").outgoing.first().cyclic
 
     }
 

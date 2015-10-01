@@ -47,8 +47,8 @@ class GraphTest {
 
         Graph g = new Graph(sr)
         assert g.nodes.size() == 2
-        assert g.nodes.find {it.name == "dependent"}.outgoing.size() == 1
-        assert g.nodes.find {it.name == "dependent"}.outgoing.first().to.name == "independent"
+        assert g.node("dependent").outgoing.size() == 1
+        assert g.node("dependent").outgoing.first().to.name == "independent"
 
     }
 

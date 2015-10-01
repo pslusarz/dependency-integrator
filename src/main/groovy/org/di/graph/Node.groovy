@@ -14,6 +14,10 @@ class Node {
         projectSource?.name
     }
 
+    Edge outgoing(String projectSourceName) {
+        outgoing.find { it.to.name == projectSourceName }
+    }
+
     @Override
     String toString() {
         return name

@@ -98,7 +98,7 @@ class UpdaterTest {
         assert 5 == new StalenessCalculator(updater.graph).metric
         updater.update()
         assert 0 == new StalenessCalculator(updater.graph).metric //new version of "child"
-        assert updater.graph.nodes.find { it.name == "grandchild" }.outgoing[0].dependency.version.value == 3
+        assert updater.graph.node("grandchild").outgoing("child").dependency.version.value == 3
         //new version of child was produced
     }
 
@@ -118,9 +118,9 @@ class UpdaterTest {
         ))
 
         assert 1 == new StalenessCalculator(updater.graph).metric
-        assert updater.graph.nodes.find { it.name == "child" }.outgoing[0].dependency.version.value == 1 //precondition
+        assert updater.graph.node("child").outgoing("parent").dependency.version.value == 1 //precondition
         updater.update()
         assert 1 == new StalenessCalculator(updater.graph).metric
-        assert updater.graph.nodes.find { it.name == "child" }.outgoing[0].dependency.version.value == 1
+        assert updater.graph.node("child").outgoing("parent").dependency.version.value == 1
     }
 }

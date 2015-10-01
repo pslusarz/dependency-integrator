@@ -22,11 +22,9 @@ class BulkDependencyIncrementerTest {
             }
         }))
 
-        def incremented = new BulkDependencyIncrementer(node: g.nodes.find { it.name == "one" }).increment()
+        def incremented = new BulkDependencyIncrementer(node: g.node("one")).increment()
         assert incremented
-        assert g.rebuild().nodes.find {
-            it.name == "one"
-        }.outgoing[0].dependency.version == new VersionForTesting(value: 2)
+        assert g.rebuild().node("one").outgoing("two").dependency.version == new VersionForTesting(value: 2)
     }
 
     @Test
@@ -46,10 +44,10 @@ class BulkDependencyIncrementerTest {
                 version = 3
             }
         }))
-        def di = new BulkDependencyIncrementer(node: g.nodes.find { it.name == "one" })
+        def di = new BulkDependencyIncrementer(node: g.node("one"))
         di.increment()
-        def currentDependency = g.rebuild().nodes.find{it.name == "one"}.outgoing.find{it.to.name == "current"}.dependency //projects.find {it.name == "one"}.dependencies.find{it.projectSourceName == "current"}
-        def staleDependency = g.rebuild().nodes.find{it.name == "one"}.outgoing.find{it.to.name == "stale"}.dependency //projects.find {it.name == "one"}.dependencies.find{it.projectSourceName == "stale"}
+        def currentDependency = g.rebuild().node("one").outgoing ("current").dependency
+        def staleDependency =   g.rebuild().node("one").outgoing("stale")  .dependency
         assert currentDependency.version == new VersionForTesting(value: 2)
         assert staleDependency.version == new VersionForTesting(value: 3)
 
@@ -67,10 +65,10 @@ class BulkDependencyIncrementerTest {
                 version = 2
             }
         }))
-        def di = new BulkDependencyIncrementer(node: g.nodes.find { it.name == "one" })
+        def di = new BulkDependencyIncrementer(node: g.node("one"))
         def incremented = di.increment()
         assert !incremented
-        def currentDependency = g.rebuild().nodes.find{it.name == "one"}.outgoing.find{it.to.name == "current"}.dependency //projects.find {it.name == "one"}.dependencies.find{it.projectSourceName == "current"}
+        def currentDependency = g.rebuild().node("one").outgoing("current").dependency
         assert currentDependency.version == new VersionForTesting(value: 2)
     }
 
@@ -91,12 +89,12 @@ class BulkDependencyIncrementerTest {
                 version = 2
             }
         }))
-        def di = new BulkDependencyIncrementer(node: g.nodes.find { it.name == "one" })
+        def di = new BulkDependencyIncrementer(node: g.node("one"))
         di.increment()
         di.rollback()
 
-        def rolledbackDependency = g.rebuild().nodes.find{it.name == "one"}.outgoing.find{it.to.name == "stale"}.dependency //projects.find {it.name == "one"}.dependencies.find{it.projectSourceName == "current"}
-        def untouchedDependency = g.rebuild().nodes.find{it.name == "one"}.outgoing.find{it.to.name == "current"}.dependency //projects.find {it.name == "one"}.dependencies.find{it.projectSourceName == "stale"}
+        def rolledbackDependency = g.rebuild().node("one").outgoing("stale").dependency
+        def untouchedDependency = g.rebuild().node("one").outgoing("current").dependency
 
 
         assert rolledbackDependency.version == new VersionForTesting(value: 1)

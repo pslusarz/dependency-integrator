@@ -24,7 +24,7 @@ class Graph {
             node.projectSource.dependencies.findAll {
                 nodes.collect { it.name }.contains(it.projectSourceName)
             }.each { Dependency dependency ->
-                node.outgoing << new Edge(to: nodes.find { it.name == dependency.projectSourceName }, dependency: dependency, from: node)
+                node.outgoing << new Edge(to: this.node(dependency.projectSourceName), dependency: dependency, from: node)
             }
         }
     }
@@ -63,6 +63,10 @@ class Graph {
 
         }
 
+    }
+
+    public node(String name) {
+        nodes.find {it.name == name}
     }
 
     private static markEdgesCyclic(List<Node> cycle) {

@@ -40,9 +40,9 @@ class GraphRankAssignmentTest {
         Graph g = new Graph(sr)
 
         g.initRank()
-        assert g.nodes.find {it.name == "primus"}.rank == 3
-        assert g.nodes.find {it.name == "secundus"}.rank == 2
-        assert g.nodes.find {it.name == "tertius"}.rank == 1
+        assert g.node("primus").rank == 3
+        assert g.node("secundus").rank == 2
+        assert g.node("tertius").rank == 1
     }
 
     @Test
@@ -71,7 +71,7 @@ class GraphRankAssignmentTest {
         Graph g = new Graph(sr)
 
         g.initRank()
-        assert g.nodes.find {it.name == "primus"}.rank == 3
+        assert g.node("primus").rank == 3
     }
 
     @Test
@@ -96,9 +96,9 @@ class GraphRankAssignmentTest {
         Graph g = new Graph(sr)
 
         g.initRank()
-        assert g.nodes.find {it.name == "primus"}.rank == 1
-        assert g.nodes.find {it.name == "secundus"}.rank == 1
-        assert g.nodes.find {it.name == "tertius"}.rank == 1
+        assert g.node("primus").rank == 1
+        assert g.node("secundus").rank == 1
+        assert g.node("tertius").rank == 1
     }
 
     @Test
@@ -123,9 +123,9 @@ class GraphRankAssignmentTest {
         Graph g = new Graph(sr)
 
         g.initRank()
-        assert g.nodes.find {it.name == "primus"}.rank == 1
-        assert g.nodes.find {it.name == "secundus"}.rank == 2
-        assert g.nodes.find {it.name == "tertius"}.rank == 1
+        assert g.node("primus").rank == 1
+        assert g.node("secundus").rank == 2
+        assert g.node("tertius").rank == 1
     }
 
 }

@@ -136,7 +136,7 @@ public class Main {
         println "RUNNNING ALL TESTS TOOK: " + length
 
         results.findAll { it.result == BuildRecord.BuildResult.Failed }.each { BuildRecord record ->
-            graph.nodes.find { it.name == record.projectSource.name }.buildFailed = true
+            graph.node(record.projectSource.name).buildFailed = true
         }
 
         def gv = new GraphVizGenerator(graph: graph)
@@ -146,13 +146,13 @@ public class Main {
         def failedProjectNodes = results.findAll {
             it.result == BuildRecord.BuildResult.Failed
         }.collect { BuildRecord record ->
-            graph.nodes.find { it.name == record.projectSource.name }
+            graph.node(record.projectSource.name)
         }
 
         def passingProjectNodes = results.findAll {
             it.result == BuildRecord.BuildResult.Passed
         }.collect { BuildRecord record ->
-            graph.nodes.find { it.name == record.projectSource.name }
+            graph.node(record.projectSource.name)
         }
         println "FAILED: " + failedProjectNodes.groupBy { it.rank }.sort()
         println "PASSED: " + passingProjectNodes.groupBy { it.rank }.sort()
