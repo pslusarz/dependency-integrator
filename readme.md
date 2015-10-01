@@ -9,5 +9,7 @@ Below you can see an example of a dependency tree that dependency-integrator can
 
 ![dependency hierarchy screenshot](/docs/dependencies-cropped.png "Jar dependency integration")
 
+You can follow progress on the [blog](http://10kftcode.blogspot.com/). This has also been [presented](https://github.com/strangeloop/StrangeLoop2015/wiki/Unsessions#continuous-delivery-and-dependency-management-walk-into-a-bar) at 2015 Strange Loop.
+
 ---------
 [1] Chapter 13, Dependency Management. Humble, Jez. Continuous Delivery: Reliable Software Releases through Build, Test, and Deployment Automation. Addison-Wesley Signature Series. 2010
