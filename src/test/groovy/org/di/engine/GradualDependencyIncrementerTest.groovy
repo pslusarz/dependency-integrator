@@ -53,4 +53,26 @@ class GradualDependencyIncrementerTest {
 
         assert !di.increment()
     }
+
+    @Test
+    void testSimpleRollback() {
+        Graph g = new Graph(new SourceRepositoryForTesting({
+            project {
+                name = "one"
+                depends ("current", 1)
+            }
+            project {
+                name = "current"
+                version = 2
+            }
+        }))
+        def di = new GradualDependencyIncrementer(node: g.nodes.find { it.name == "one" })
+
+        di.increment()
+        di.rollback()
+        def currentDependency = g.rebuild().nodes.find{it.name == "one"}.outgoing.find{it.to.name == "current"}.dependency
+        assert currentDependency.version == new VersionForTesting(value: 1) //node
+        assert g.rebuild().nodes.find{it.name == "one"}.projectSource.dependencies.find {it.projectSourceName == "current"}.version == new VersionForTesting(value: 1) //project associated with node
+
+    }
 }
