@@ -19,7 +19,7 @@ class BulkDependencyIncrementer {
                 originalVersions[edge.dependency] = edge.dependency.version
                 node.projectSource.setDependencyVersion(edge.dependency, edge.to.projectSource.latestVersion)
                 edge.dependency = node.projectSource.dependencies.find {it.projectSourceName == edge.dependency.projectSourceName} //todo - test
-                result = true    //todo: test me!
+                result = true
 
             }
         }

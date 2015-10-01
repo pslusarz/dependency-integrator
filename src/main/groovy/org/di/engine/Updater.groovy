@@ -11,6 +11,7 @@ import org.di.graph.Node
 class Updater {
     Graph graph
     int numberOfThreads = 4
+    int numberOfBuildsPerformed = 0
     public Updater(Graph graph) {
         graph.initRank()
         this.graph = graph
@@ -42,6 +43,7 @@ class Updater {
         BuildRunner br = new BuildRunner(projectSources: updates.keySet())
         br.start(numberOfThreads)
         List<BuildRecord> results = br.completeBuildRecords
+        numberOfBuildsPerformed += results.size()
         def failedBeforeUpdate = results.findAll { it.result == BuildRecord.BuildResult.Failed }.collect {
             it.projectSource
         }

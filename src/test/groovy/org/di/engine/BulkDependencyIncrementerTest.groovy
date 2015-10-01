@@ -22,7 +22,8 @@ class BulkDependencyIncrementerTest {
             }
         }))
 
-        new BulkDependencyIncrementer(node: g.nodes.find { it.name == "one" }).increment()
+        def incremented = new BulkDependencyIncrementer(node: g.nodes.find { it.name == "one" }).increment()
+        assert incremented
         assert g.rebuild().nodes.find {
             it.name == "one"
         }.outgoing[0].dependency.version == new VersionForTesting(value: 2)
@@ -52,6 +53,25 @@ class BulkDependencyIncrementerTest {
         assert currentDependency.version == new VersionForTesting(value: 2)
         assert staleDependency.version == new VersionForTesting(value: 3)
 
+    }
+
+    @Test
+    void testNothingToIncrement() {
+        Graph g = new Graph(new SourceRepositoryForTesting({
+            project {
+                name = "one"
+                depends ("current", 2)
+            }
+            project {
+                name = "current"
+                version = 2
+            }
+        }))
+        def di = new BulkDependencyIncrementer(node: g.nodes.find { it.name == "one" })
+        def incremented = di.increment()
+        assert !incremented
+        def currentDependency = g.rebuild().nodes.find{it.name == "one"}.outgoing.find{it.to.name == "current"}.dependency //projects.find {it.name == "one"}.dependencies.find{it.projectSourceName == "current"}
+        assert currentDependency.version == new VersionForTesting(value: 2)
     }
 
     @Test

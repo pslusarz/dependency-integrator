@@ -22,6 +22,7 @@ class UpdaterTest {
         assert 2 ==  new StalenessCalculator(updater.graph).metric
         updater.update()
         assert 0 == new StalenessCalculator(updater.graph).metric
+        assert 1 == updater.numberOfBuildsPerformed
     }
 
     @Test
@@ -50,6 +51,7 @@ class UpdaterTest {
         assert 1 == new StalenessCalculator(updater.graph).metric //new version of "child"
         updater.updateRank(3)
         assert 0 == new StalenessCalculator(updater.graph).metric
+        assert 2 == updater.numberOfBuildsPerformed
     }
 
     @Test
@@ -75,6 +77,7 @@ class UpdaterTest {
         assert 3 ==  new StalenessCalculator(updater.graph).metric
         updater.update()
         assert 0 == new StalenessCalculator(updater.graph).metric
+        assert 2 == updater.numberOfBuildsPerformed
     }
 
     @Test
