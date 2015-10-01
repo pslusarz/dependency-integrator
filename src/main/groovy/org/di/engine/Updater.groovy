@@ -32,11 +32,6 @@ class Updater {
 
         graph.initRank()
         graph.nodes.findAll { it.rank == rank && it.outgoing.find { it.isStale() } }.each { Node node ->
-            println node.projectSource.name
-            node.outgoing.findAll { it.stale }.each { Edge edge ->
-                println "   " + edge.dependency.projectSourceName + "  " + edge.dependency.version + " (" + edge.to.projectSource.latestVersion + ")"
-
-            }
             def update = new BulkDependencyIncrementer(node: node)
             updates[node.projectSource] = update
         }
@@ -51,8 +46,6 @@ class Updater {
         graph.tagNodes(failedBeforeUpdate, 'failedBeforeUpdate')
         log.info "    Failed before update: " + failedBeforeUpdate
         Map<ProjectSource, BulkDependencyIncrementer> candidates = updates.findAll { true}
-//            !failedBeforeUpdate.contains(it.key)
-//        }
         candidates.each {
             it.value.increment()
         }
@@ -80,12 +73,8 @@ class Updater {
 
         def successfulUpdate = candidates.keySet()
         successfulUpdate.removeAll(failedAfterUpdate)
-//                resultsAfterUpgrade.findAll { it.result == BuildRecord.BuildResult.Passed }.collect {
-//            it.projectSource
-//        }
 
         successfulUpdate.each { successful ->
-           // println successful.class
             successful.incrementVersion()
             successful.publishArtifactToTestRepo()
         }
