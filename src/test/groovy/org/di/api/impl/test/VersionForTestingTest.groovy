@@ -56,4 +56,11 @@ class VersionForTestingTest {
         assert v1 == v2
     }
 
+    @Test
+    void testNotEquals() {
+        def v1 = new VersionForTesting(value: 1)
+        def v2 = new VersionForTesting(value: 2)
+        assert v1 != v2
+    }
+
 }

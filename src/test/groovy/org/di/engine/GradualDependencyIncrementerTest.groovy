@@ -23,8 +23,7 @@ class GradualDependencyIncrementerTest {
         assert incremented1
         def incremented2 = di.increment()
         assert !incremented2
-        def currentDependency = g.rebuild().node("one").outgoing("current").dependency //projects.find {it.name == "one"}.dependencies.find{it.projectSourceName == "current"}
-        assert currentDependency.version == new VersionForTesting(value: 2)
+        assert g.rebuild().node("one").outgoing("current").dependency.version == new VersionForTesting(value: 2)
     }
 
     @Test
@@ -43,13 +42,11 @@ class GradualDependencyIncrementerTest {
 
         def incremented1 = di.increment()
         assert incremented1
-        def currentDependency = g.rebuild().node("one").outgoing("current").dependency //projects.find {it.name == "one"}.dependencies.find{it.projectSourceName == "current"}
-        assert currentDependency.version == new VersionForTesting(value: 2)
+        assert g.rebuild().node("one").outgoing("current").dependency.version == new VersionForTesting(value: 2)
 
         def incremented2 = di.increment()
         assert incremented2
-        currentDependency = g.rebuild().node("one").outgoing("current").dependency //projects.find {it.name == "one"}.dependencies.find{it.projectSourceName == "current"}
-        assert currentDependency.version == new VersionForTesting(value: 3)
+        assert g.rebuild().node("one").outgoing("current").dependency.version == new VersionForTesting(value: 3)
 
         assert !di.increment()
     }
@@ -98,8 +95,8 @@ class GradualDependencyIncrementerTest {
         di.increment()
         di.increment()
 
-        g.rebuild().node("one").outgoing("left").dependency == new VersionForTesting(value: 2)
-        g.rebuild().node("one").outgoing("right").dependency == new VersionForTesting(value: 5)
+        assert g.rebuild().node("one").outgoing("left").dependency.version == new VersionForTesting(value: 2)
+        assert g.rebuild().node("one").outgoing("right").dependency.version == new VersionForTesting(value: 5)
     }
 
     @Test
@@ -126,8 +123,8 @@ class GradualDependencyIncrementerTest {
         di.rollback()
         di.increment()
 
-        g.rebuild().node("one").outgoing("left").dependency == new VersionForTesting(value: 1) //rolled back
-        g.rebuild().node("one").outgoing("right").dependency == new VersionForTesting(value: 5)
+        assert g.rebuild().node("one").outgoing("left").dependency.version == new VersionForTesting(value: 1) //rolled back
+        assert g.rebuild().node("one").outgoing("right").dependency.version == new VersionForTesting(value: 5)
     }
 
     @Test
@@ -149,13 +146,13 @@ class GradualDependencyIncrementerTest {
         di.rollback() //failed on version 2
         di.increment()
 
-        g.rebuild().node("one").outgoing("two").dependency == new VersionForTesting(value: 3)
+        g.rebuild().node("one").outgoing("two").dependency.version == new VersionForTesting(value: 3)
 
         di.increment()
-        g.rebuild().node("one").outgoing("two").dependency == new VersionForTesting(value: 4)
+        assert g.rebuild().node("one").outgoing("two").dependency.version == new VersionForTesting(value: 4)
         di.rollback() //failed on 4
         di.increment()
-        g.rebuild().node("one").outgoing("two").dependency == new VersionForTesting(value: 5)
+        assert g.rebuild().node("one").outgoing("two").dependency.version == new VersionForTesting(value: 5)
 
     }
 
@@ -180,9 +177,9 @@ class GradualDependencyIncrementerTest {
         di.increment() //now try 4
         di.rollback() //4 fails
         di.increment() //try 5
-        g.rebuild().node("one").outgoing("two").dependency == new VersionForTesting(value: 5)
+        assert g.rebuild().node("one").outgoing("two").dependency.version == new VersionForTesting(value: 5)
         di.rollback() //5 fails
-        g.rebuild().node("one").outgoing("two").dependency == new VersionForTesting(value: 2)
+        assert g.rebuild().node("one").outgoing("two").dependency.version == new VersionForTesting(value: 2)
     }
 
 }
