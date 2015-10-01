@@ -6,12 +6,13 @@ import org.di.api.Version
 import org.di.graph.Edge
 import org.di.graph.Node
 
-class BulkDependencyIncrementer {
+class BulkDependencyIncrementer extends DependencyIncrementer {
     ProjectSource projectSource
     Collection<ProjectSource> projectSources
     Map<Dependency, Version> originalVersions = [:]
-    Node node
+    //Node node
 
+    @Override
     boolean increment() {
         boolean result = false
         node.outgoing.each { Edge edge ->
@@ -26,6 +27,7 @@ class BulkDependencyIncrementer {
         return result
     }
 
+    @Override
     void rollback() {
         originalVersions.each { Dependency dependency, Version originalVersion ->
             node.projectSource.setDependencyVersion(dependency, originalVersion)

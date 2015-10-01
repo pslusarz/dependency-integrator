@@ -32,7 +32,15 @@ public class Main {
         //testAll(repository)
         //updatePluginsOnFailing(repository)
         //changeImpact(repository)
-        drawGraph(repository)
+        //drawGraph(repository)
+        codefest(repository)
+    }
+
+    static void codefest(CarfaxLibSourceRepository repository) {
+        def projects = repository.init()
+        Graph g = new Graph(projects)
+        StalenessCalculator calc = new StalenessCalculator(g)
+        println "STALENESS: " + calc.metric
     }
 
     static void changeImpact(CarfaxLibSourceRepository carfaxLibSourceRepository) {

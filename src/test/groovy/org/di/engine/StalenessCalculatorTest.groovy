@@ -33,7 +33,6 @@ class StalenessCalculatorTest {
             project {
                 name = "root"
                 version = 2
-                versions = [1,2]
             }
             project {
                 name = "child"
@@ -50,7 +49,6 @@ class StalenessCalculatorTest {
             project {
                 name = "root"
                 version = 3
-                versions = [1,2,3]
             }
             project {
                 name = "child"
@@ -68,7 +66,6 @@ class StalenessCalculatorTest {
             project {
                 name = "root"
                 version = 6
-                versions = [1,2,3,4,5,6]
             }
             project {
                 name = "child"
@@ -90,7 +87,6 @@ class StalenessCalculatorTest {
             project {
                 name = "root"
                 version = 6
-                versions = [1,2,3,4,5,6]
             }
             project {
                 name = "diamond-bottom"
@@ -123,7 +119,6 @@ class StalenessCalculatorTest {
             project {
                 name = "root"
                 version = 3
-                versions = [1,2,3]
             }
             project {
                 name = "left"
@@ -146,8 +141,7 @@ class StalenessCalculatorTest {
         Graph g = new Graph(new SourceRepositoryForTesting({
             project {
                 name = "root"
-                version = 3
-                versions = [1,3]
+                version = 2
             }
             project {
                 name = "child"
@@ -171,7 +165,6 @@ class StalenessCalculatorTest {
             project {
                 name = "10"
                 version = 8
-                versions = [1,2,3,4,5,6,7,8]
             }
             project {
                 name = "20"
@@ -203,12 +196,10 @@ class StalenessCalculatorTest {
             project {
                 name = "10"
                 version = 5
-                versions = [1,2,3,4,5]
             }
             project {
                 name = "20"
                 version = 6
-                versions = [1,2,3,4,5,6]
                 depends("10", 1)
             }
 
@@ -237,19 +228,16 @@ class StalenessCalculatorTest {
             project {
                 name = "10"
                 version = 5
-                versions = [1,2,3,4,5]
             }
             project {
                 name = "20"
                 version = 10
-                versions = [1,2,3,4,5,6,7,8,9,10]
                 depends("10", 5) //latest
             }
 
             project {
                 name = "21"
                 version = 2
-                versions = [1,2]
                 depends("10", 5) //latest
             }
 
@@ -274,13 +262,11 @@ class StalenessCalculatorTest {
             project {
                 name = "a"
                 version = 5
-                versions = [1,2,3,4,5]
                 depends("b", 3)
             }
             project {
                 name = "b"
                 version = 6
-                versions = [1,2,3,4,5,6]
                 depends("a", 1)
             }
 

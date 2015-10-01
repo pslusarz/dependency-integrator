@@ -67,4 +67,16 @@ class ProjectSourceForTestingTest {
         project.setDependencyGuarded(dependencyOrig)
         assert project.dependencies.find {"another"}.guarded
     }
+
+    @Test
+    void versionsGetBackfilled() {
+        def project = new ProjectSourceForTesting({
+            name = "myproject"
+            version = 3
+        })
+        assert project.versions.size() == 3
+        assert project.versions.first() == new VersionForTesting(value: 1)
+        assert project.versions.last() == new VersionForTesting(value: 3)
+        assert project.versions[1] == new VersionForTesting(value: 2)
+    }
 }
