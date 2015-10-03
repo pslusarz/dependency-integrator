@@ -121,7 +121,7 @@ class GradualDependencyIncrementerTest {
 
         di.increment()
         di.rollback()
-        di.increment()
+        assert di.increment()
 
         assert g.rebuild().node("one").outgoing("left").dependency.version == new VersionForTesting(value: 1) //rolled back
         assert g.rebuild().node("one").outgoing("right").dependency.version == new VersionForTesting(value: 5)

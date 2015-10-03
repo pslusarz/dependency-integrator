@@ -6,25 +6,25 @@ import org.di.graph.Edge
 
 class GradualDependencyIncrementer extends DependencyIncrementer {
     Map<Edge, Version> originalVersions = [:]
-    Map<Edge, List<Version>> failingVersions = [:].withDefault {[]}
-    Map<Edge, List<Version>> passingVersions = [:].withDefault {[]}
+    Map<Edge, List<Version>> failingVersions = [:].withDefault { [] }
+    Map<Edge, List<Version>> passingVersions = [:].withDefault { [] }
+    List<Edge> exhaustedEdges = []
 
     @Override
     boolean increment() {
         boolean result = false
-        Edge staleEdge = node.outgoing.find { it.isStale() }
+        Edge staleEdge = node.outgoing.find { it.isStale() && !exhaustedEdges.contains(it)}
 
         if (staleEdge != null) {
-            if (passingVersions[staleEdge].size() == 0) { //assume initial version is passing so it can be rolled back
-                passingVersions[staleEdge] << staleEdge.dependency.version
-            }
-            if (originalVersions[staleEdge] != null) {
-                passingVersions[staleEdge] << originalVersions[staleEdge]
-            }
             originalVersions[staleEdge] = staleEdge.dependency.version
+            passingVersions[staleEdge] << originalVersions[staleEdge]
+
             Version nextVersion = getNextVersion(staleEdge.to.projectSource, max(lastOrNull(passingVersions[staleEdge]), lastOrNull(failingVersions[staleEdge])))
+
             if (nextVersion == null) {
                 result = false
+                exhaustedEdges << staleEdge
+                result = increment() //this edge is done, is there another?
             } else {
                 staleEdge.setDependencyVersion(nextVersion)
                 result = true
@@ -45,25 +45,23 @@ class GradualDependencyIncrementer extends DependencyIncrementer {
     }
 
     Version getNextVersion(ProjectSource projectSource, Version current) {
-       int currentIndex = projectSource.versions.indexOf(current)
+        int currentIndex = projectSource.versions.indexOf(current)
         if (currentIndex == -1) {
-           return projectSource.versions.first()
+            return projectSource.versions.first()
         }
-        if (currentIndex == projectSource.versions.size() -1) {
-          return null
+        if (currentIndex == projectSource.versions.size() - 1) {
+            return null
         }
-        return projectSource.versions[currentIndex+1]
+        return projectSource.versions[currentIndex + 1]
     }
 
     Version max(Version first, second) {
         Version result
         if (first == null) {
             result = second
-        } else
-        if (second == null) {
+        } else if (second == null) {
             result = first
-        } else
-        if (first.after(second)) {
+        } else if (first.after(second)) {
             result = first
         } else {
             result = second
